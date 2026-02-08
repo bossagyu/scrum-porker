@@ -66,8 +66,31 @@ Scrum Poker real-time estimation app: Next.js 16 App Router + Supabase + Zustand
 
 ## Rules
 
-- **テスト実行**: コードを変更・追加したら、必ず関連するテスト (`pnpm test` / `pnpm test:e2e`) を実行して通ることを確認する
-- **作業範囲**: このリポジトリ (`/Users/kouhei/Program/bossagyu/scrum-porker`) 内のファイルのみ編集すること。リポジトリ外のファイルを変更してはいけない
+### ワークフロー
+- DB スキーマを変更したら `supabase/migrations/` に新しいマイグレーションファイルを作成し、`npx supabase db reset` で適用する
+- `src/lib/supabase/types.ts` は手動管理。テーブルやRPC関数を追加・変更したら必ずこのファイルも更新する
+- コードを変更・追加したら、必ず関連するテスト (`pnpm test` / `pnpm test:e2e`) を実行して通ることを確認する
+- E2E テストを追加したら `pnpm test:e2e` で既存テストを含め全テスト通過を確認する
+
+### 禁止事項
+- このリポジトリ外のファイルを変更してはいけない
+- `npx supabase gen types` で型を自動生成しない（手動管理の `types.ts` と競合する）
+- RLS ポリシーでテーブル自身を参照しない（無限再帰になる）。必ず `SECURITY DEFINER` 関数を経由する
+- Server Action 内で `redirect()` を使わない（匿名認証のCookieが消える）。`{ redirectTo }` を返してクライアント側で `window.location.href` を使う
+- Supabase Realtime だけに依存しない（SECURITY DEFINER ポリシーでイベントが配信されない）。ポーリングを併用する
+
+### Git
+- 実装を始める前に `git pull origin main` で最新を取得し、`main` から feature ブランチを作成する（例: `feat/timer`, `fix/auto-reveal-bug`）
+- `main` に直接コミットしない
+- コミットメッセージは Conventional Commits 形式: `feat:`, `fix:`, `refactor:`, `test:`, `docs:`, `chore:`
+- マイグレーションファイル名は `YYYYMMDDHHMMSS_<description>.sql` 形式
+- `.env.local` や Supabase のシークレットをコミットしない
+- 実装完了後は GitHub に PR を作成する
+
+### テスト
+- Playwright でカードボタンを指定する際は必ず `exact: true` を使う（例: `{ name: '3', exact: true }`）。省略すると '13', '34' 等にもマッチする
+- マルチユーザーテストは `browser.newContext()` で別のブラウザコンテキストを作成し、ユーザーごとに独立した認証セッションを使う
+- E2E テストのヘルパー関数は `e2e/helpers.ts` に集約する
 
 ## Environment Setup
 
