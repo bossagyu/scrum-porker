@@ -1,0 +1,19 @@
+export const CARD_SETS = {
+  fibonacci: {
+    name: 'フィボナッチ数列',
+    cards: ['0', '1', '2', '3', '5', '8', '13', '21', '34', '?', '∞', '☕'],
+  },
+  tshirt: {
+    name: 'Tシャツサイズ',
+    cards: ['XS', 'S', 'M', 'L', 'XL', 'XXL', '?', '☕'],
+  },
+  powerOf2: {
+    name: '2のべき乗',
+    cards: ['1', '2', '4', '8', '16', '32', '64', '?', '∞', '☕'],
+  },
+} as const
+
+export type CardSetType = keyof typeof CARD_SETS
+
+// Special cards that cannot be used in numeric calculations
+export const SPECIAL_CARDS = ['?', '∞', '☕'] as const
