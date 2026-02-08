@@ -2,6 +2,7 @@ import type { Page } from '@playwright/test'
 
 type CreateRoomOptions = {
   readonly autoReveal?: boolean
+  readonly timerDuration?: 30 | 60 | 120 | 300
 }
 
 export async function createRoom(
@@ -13,6 +14,10 @@ export async function createRoom(
   await page.goto('/')
   await page.locator('#name').fill(roomName)
   await page.locator('#displayName').fill(displayName)
+
+  if (options?.timerDuration) {
+    await page.locator(`input[name="timerDuration"][value="${options.timerDuration}"]`).check()
+  }
 
   if (options?.autoReveal) {
     await page.locator('#autoReveal').check()

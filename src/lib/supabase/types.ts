@@ -9,6 +9,7 @@ export type Database = {
           created_by: string | null
           card_set: string
           auto_reveal: boolean
+          timer_duration: number | null
           is_active: boolean
           created_at: string
           expires_at: string
@@ -20,6 +21,7 @@ export type Database = {
           created_by?: string | null
           card_set?: string
           auto_reveal?: boolean
+          timer_duration?: number | null
           is_active?: boolean
           created_at?: string
           expires_at?: string
@@ -31,6 +33,7 @@ export type Database = {
           created_by?: string | null
           card_set?: string
           auto_reveal?: boolean
+          timer_duration?: number | null
           is_active?: boolean
           created_at?: string
           expires_at?: string
@@ -127,6 +130,10 @@ export type Database = {
     }
     Functions: {
       auto_reveal_if_complete: {
+        Args: { p_session_id: string }
+        Returns: boolean
+      }
+      reveal_on_timer_expiry: {
         Args: { p_session_id: string }
         Returns: boolean
       }

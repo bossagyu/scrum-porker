@@ -17,3 +17,12 @@ export type CardSetType = keyof typeof CARD_SETS
 
 // Special cards that cannot be used in numeric calculations
 export const SPECIAL_CARDS = ['?', '∞', '☕'] as const
+
+// Timer duration options in seconds (null = no timer)
+export const TIMER_OPTIONS = [
+  { value: null, label: 'なし' },
+  { value: 30, label: '30秒' },
+  { value: 60, label: '1分' },
+  { value: 120, label: '2分' },
+  { value: 300, label: '5分' },
+] as const
