@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getRoomByCode } from '@/actions/room'
 import { JoinRoomForm } from '@/components/room/join-room-form'
@@ -5,6 +6,14 @@ import { CARD_SETS, type CardSetType } from '@/lib/constants'
 
 type JoinPageProps = {
   readonly params: Promise<{ code: string }>
+}
+
+export async function generateMetadata({ params }: JoinPageProps): Promise<Metadata> {
+  const { code } = await params
+  return {
+    title: `ルーム ${code.toUpperCase()} に参加`,
+    robots: { index: false },
+  }
 }
 
 export default async function JoinPage({ params }: JoinPageProps) {

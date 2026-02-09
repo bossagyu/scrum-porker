@@ -5,6 +5,7 @@ import { useRoomStore } from '@/stores/room-store'
 import { getSessionHistory, type SessionHistoryEntry } from '@/actions/history'
 import { generateCsv, generateJson, downloadFile, type ExportSession } from '@/lib/export-utils'
 import { SPECIAL_CARDS } from '@/lib/constants'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
@@ -90,7 +91,23 @@ export function SessionHistory({ onClose }: SessionHistoryProps) {
         </div>
       </CardHeader>
       <CardContent>
-        {loading && <p className="text-muted-foreground text-sm">読み込み中...</p>}
+        {loading && (
+          <div className="space-y-4">
+            {Array.from({ length: 3 }, (_, i) => (
+              <div key={i} className="space-y-2 rounded-md border p-3">
+                <div className="flex items-center justify-between">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-3 w-16" />
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {Array.from({ length: 4 }, (_, j) => (
+                    <Skeleton key={j} className="h-7 w-20 rounded" />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
         {error && <p className="text-destructive text-sm">{error}</p>}
         {!loading && !error && history.length === 0 && (
           <p className="text-muted-foreground text-sm">まだ公開済みのラウンドはありません</p>

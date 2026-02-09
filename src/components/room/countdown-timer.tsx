@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useRoomStore } from '@/stores/room-store'
 import { revealOnTimerExpiry } from '@/actions/vote'
+import { cn } from '@/lib/utils'
 
 export function CountdownTimer() {
   const timerDuration = useRoomStore((s) => s.timerDuration)
@@ -53,16 +54,38 @@ export function CountdownTimer() {
   const seconds = remainingSeconds % 60
   const display = `${minutes}:${seconds.toString().padStart(2, '0')}`
   const isUrgent = remainingSeconds <= 10
+  const isVeryUrgent = remainingSeconds <= 5
 
   return (
     <div
-      className={`rounded-md px-3 py-1 text-lg font-mono font-bold ${
+      className={`rounded-md px-3 py-1 font-mono ${
         isUrgent ? 'bg-destructive/10 text-destructive' : 'bg-muted text-foreground'
       }`}
       role="timer"
       aria-label={`残り時間 ${display}`}
+      style={isUrgent ? { animation: 'pulse-urgent 1s ease-in-out infinite' } : undefined}
     >
-      {display}
+      <span
+        className={cn(
+          'inline-block text-lg font-bold transition-all duration-200',
+          isVeryUrgent && 'scale-110 font-extrabold',
+        )}
+      >
+        {display}
+      </span>
+      {timerDuration !== null && timerDuration > 0 && (
+        <div className="mt-1 h-1 w-full overflow-hidden rounded-full bg-muted">
+          <div
+            className={cn(
+              'h-full rounded-full transition-all duration-1000 ease-linear',
+              isUrgent ? 'bg-destructive' : 'bg-primary',
+            )}
+            style={{
+              width: timerDuration > 0 ? `${(remainingSeconds / timerDuration) * 100}%` : '0%',
+            }}
+          />
+        </div>
+      )}
     </div>
   )
 }

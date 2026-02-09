@@ -113,6 +113,17 @@ export function CreateRoomForm() {
             <Label htmlFor="autoReveal">全員投票後に自動で結果を表示</Label>
           </div>
 
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="allowAllControl"
+              name="allowAllControl"
+              value="true"
+              className="accent-primary"
+            />
+            <Label htmlFor="allowAllControl">全員が結果の公開・次のラウンドを操作可能</Label>
+          </div>
+
           {state.error && (
             <p className="text-sm text-destructive" role="alert">
               {state.error}

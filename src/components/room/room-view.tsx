@@ -42,6 +42,8 @@ export function RoomView({
       roomCode: room.code,
       cardSet: room.card_set,
       timerDuration: room.timer_duration,
+      autoReveal: room.auto_reveal,
+      allowAllControl: room.allow_all_control,
       participants: initialParticipants,
       currentSession: initialSession,
       votes: initialVotes,
@@ -55,6 +57,8 @@ export function RoomView({
     room.code,
     room.card_set,
     room.timer_duration,
+    room.auto_reveal,
+    room.allow_all_control,
     initialParticipants,
     initialSession,
     initialVotes,
@@ -67,7 +71,7 @@ export function RoomView({
     <div className="space-y-6">
       <RoomHeader onToggleHistory={() => setShowHistory((prev) => !prev)} />
       {showHistory && <SessionHistory onClose={() => setShowHistory(false)} />}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_300px]">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-[1fr_280px] lg:grid-cols-[1fr_300px]">
         <div className="space-y-6">
           <VotingCards />
           {isRevealed && (

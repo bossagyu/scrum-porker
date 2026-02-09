@@ -1,9 +1,18 @@
-import { redirect } from 'next/navigation'
+import type { Metadata } from 'next'
+import { notFound, redirect } from 'next/navigation'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { RoomView } from '@/components/room/room-view'
 
 type PageProps = {
   readonly params: Promise<{ code: string }>
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { code } = await params
+  return {
+    title: `ルーム ${code.toUpperCase()}`,
+    robots: { index: false },
+  }
 }
 
 export default async function RoomPage({ params }: PageProps) {
@@ -18,7 +27,7 @@ export default async function RoomPage({ params }: PageProps) {
     .single()
 
   if (roomError || !room) {
-    redirect('/')
+    notFound()
   }
 
   const { data: participants } = await supabase

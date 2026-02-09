@@ -20,16 +20,28 @@ export function VoteResult() {
       </CardHeader>
       <CardContent>
         <ul className="space-y-2">
-          {activeVoters.map((participant) => {
+          {activeVoters.map((participant, index) => {
             const cardValue = votesByParticipant.get(participant.id)
 
             return (
               <li
                 key={participant.id}
                 className="flex items-center justify-between"
+                style={{
+                  animation: 'fade-in 0.3s ease-out forwards',
+                  animationDelay: `${index * 0.05}s`,
+                  opacity: 0,
+                }}
               >
                 <span>{participant.display_name}</span>
-                <span className="text-lg font-bold">
+                <span
+                  className="text-lg font-bold"
+                  style={{
+                    animation: 'card-flip 0.4s ease-out forwards',
+                    animationDelay: `${index * 0.05 + 0.1}s`,
+                    opacity: 0,
+                  }}
+                >
                   {cardValue ?? '---'}
                 </span>
               </li>

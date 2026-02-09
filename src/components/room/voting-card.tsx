@@ -21,11 +21,14 @@ export function VotingCard({
       onClick={() => onSelect(value)}
       disabled={isDisabled}
       className={cn(
-        'flex h-24 w-16 items-center justify-center rounded-lg border-2 text-lg font-bold transition-all',
-        'hover:scale-105 hover:shadow-md',
-        'disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100 disabled:hover:shadow-none',
+        'flex h-20 w-14 items-center justify-center rounded-lg border-2 text-lg font-bold',
+        'transition-all duration-200 ease-out',
+        'sm:h-24 sm:w-16',
+        'hover:-translate-y-1 hover:shadow-md',
+        'active:scale-95',
+        'disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none',
         isSelected
-          ? 'border-primary bg-primary text-primary-foreground shadow-md'
+          ? 'border-primary bg-primary text-primary-foreground shadow-md ring-2 ring-primary/30'
           : 'border-border bg-card hover:border-primary/50',
       )}
     >

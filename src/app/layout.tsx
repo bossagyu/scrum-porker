@@ -2,9 +2,37 @@ import type { Metadata } from 'next'
 import { Header } from '@/components/layout/header'
 import './globals.css'
 
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000'
+
 export const metadata: Metadata = {
-  title: 'Scrum Poker',
-  description: 'シンプルで使いやすいスクラムポーカーツール',
+  title: {
+    default: 'Scrum Poker',
+    template: '%s | Scrum Poker',
+  },
+  description:
+    'シンプルで使いやすいスクラムポーカーツール。リアルタイムでチームのストーリーポイント見積もりを効率化。',
+  keywords: ['スクラム', 'ポーカー', 'アジャイル', '見積もり', 'プランニングポーカー'],
+  authors: [{ name: 'Scrum Poker Team' }],
+  icons: {
+    icon: '/favicon.svg',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'ja_JP',
+    url: baseUrl,
+    siteName: 'Scrum Poker',
+    title: 'Scrum Poker',
+    description: 'シンプルで使いやすいスクラムポーカーツール',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'Scrum Poker',
+    description: 'シンプルで使いやすいスクラムポーカーツール',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -13,6 +13,8 @@ type RoomState = {
   readonly roomCode: string | null
   readonly cardSet: string
   readonly timerDuration: number | null
+  readonly autoReveal: boolean
+  readonly allowAllControl: boolean
   readonly participants: readonly ParticipantRow[]
   readonly currentSession: VotingSessionRow | null
   readonly votes: readonly VoteRow[]
@@ -26,6 +28,8 @@ type RoomActions = {
     readonly roomCode: string
     readonly cardSet: string
     readonly timerDuration: number | null
+    readonly autoReveal: boolean
+    readonly allowAllControl: boolean
     readonly participants: readonly ParticipantRow[]
     readonly currentSession: VotingSessionRow | null
     readonly votes: readonly VoteRow[]
@@ -43,6 +47,8 @@ const initialState: RoomState = {
   roomCode: null,
   cardSet: 'fibonacci',
   timerDuration: null,
+  autoReveal: false,
+  allowAllControl: false,
   participants: [],
   currentSession: null,
   votes: [],
@@ -59,6 +65,8 @@ export const useRoomStore = create<RoomStore>((set, get) => ({
       roomCode: params.roomCode,
       cardSet: params.cardSet,
       timerDuration: params.timerDuration,
+      autoReveal: params.autoReveal,
+      allowAllControl: params.allowAllControl,
       participants: params.participants,
       currentSession: params.currentSession,
       votes: params.votes,
@@ -240,6 +248,21 @@ export const useRoomStore = create<RoomStore>((set, get) => ({
         } else {
           set({ currentSession: session })
         }
+      }
+
+      const { data: roomData } = await supabase
+        .from('rooms')
+        .select('card_set, timer_duration, auto_reveal, allow_all_control')
+        .eq('id', roomId)
+        .single()
+
+      if (roomData) {
+        set({
+          cardSet: roomData.card_set,
+          timerDuration: roomData.timer_duration,
+          autoReveal: roomData.auto_reveal,
+          allowAllControl: roomData.allow_all_control,
+        })
       }
     }, 3000)
 
