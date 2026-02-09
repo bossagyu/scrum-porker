@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { CARD_SETS, type CardSetType } from '@/lib/constants'
+import { CARD_SETS, type CardSetType, TIMER_OPTIONS } from '@/lib/constants'
 import { createRoom, type CreateRoomState } from '@/actions/room'
 
 const initialState: CreateRoomState = {}
@@ -76,6 +76,27 @@ export function CreateRoomForm() {
                       {CARD_SETS[option.value].cards.join(', ')}
                     </div>
                   </div>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>タイマー</Label>
+            <div className="flex flex-wrap gap-2">
+              {TIMER_OPTIONS.map((option) => (
+                <label
+                  key={option.label}
+                  className="flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2 hover:bg-accent"
+                >
+                  <input
+                    type="radio"
+                    name="timerDuration"
+                    value={option.value ?? ''}
+                    defaultChecked={option.value === null}
+                    className="accent-primary"
+                  />
+                  <span className="text-sm">{option.label}</span>
                 </label>
               ))}
             </div>

@@ -8,6 +8,9 @@ const createRoomSchema = z.object({
   name: z.string().min(1, 'ルーム名を入力してください').max(100, 'ルーム名は100文字以内で入力してください'),
   cardSet: z.enum(['fibonacci', 'tshirt', 'powerOf2']),
   autoReveal: z.boolean().default(false),
+  timerDuration: z
+    .union([z.literal(30), z.literal(60), z.literal(120), z.literal(300), z.null()])
+    .default(null),
   displayName: z
     .string()
     .min(1, '表示名を入力してください')
@@ -49,10 +52,14 @@ export async function createRoom(
     userId = authData.user?.id
   }
 
+  const timerRaw = formData.get('timerDuration')
+  const timerDuration = timerRaw && timerRaw !== '' ? Number(timerRaw) : null
+
   const parsed = createRoomSchema.safeParse({
     name: formData.get('name'),
     cardSet: formData.get('cardSet'),
     autoReveal: formData.get('autoReveal') === 'true',
+    timerDuration,
     displayName: formData.get('displayName'),
   })
 
@@ -70,6 +77,7 @@ export async function createRoom(
       created_by: userId!,
       card_set: parsed.data.cardSet,
       auto_reveal: parsed.data.autoReveal,
+      timer_duration: parsed.data.timerDuration,
     })
     .select('*')
     .single()

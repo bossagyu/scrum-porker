@@ -60,6 +60,28 @@ export async function revealVotes(sessionId: string) {
   }
 }
 
+export async function revealOnTimerExpiry(sessionId: string) {
+  if (!sessionId) {
+    return { error: '無効なセッションIDです' }
+  }
+
+  try {
+    const supabase = await createServerSupabaseClient()
+
+    const { data, error } = await supabase.rpc('reveal_on_timer_expiry', {
+      p_session_id: sessionId,
+    })
+
+    if (error) {
+      return { error: 'タイマー公開に失敗しました' }
+    }
+
+    return { success: true, revealed: data }
+  } catch {
+    return { error: 'タイマー公開に失敗しました' }
+  }
+}
+
 export async function resetVoting(roomId: string) {
   if (!roomId) {
     return { error: '無効なルームIDです' }

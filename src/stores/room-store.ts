@@ -12,6 +12,7 @@ type RoomState = {
   readonly roomId: string | null
   readonly roomCode: string | null
   readonly cardSet: string
+  readonly timerDuration: number | null
   readonly participants: readonly ParticipantRow[]
   readonly currentSession: VotingSessionRow | null
   readonly votes: readonly VoteRow[]
@@ -24,6 +25,7 @@ type RoomActions = {
     readonly roomId: string
     readonly roomCode: string
     readonly cardSet: string
+    readonly timerDuration: number | null
     readonly participants: readonly ParticipantRow[]
     readonly currentSession: VotingSessionRow | null
     readonly votes: readonly VoteRow[]
@@ -40,6 +42,7 @@ const initialState: RoomState = {
   roomId: null,
   roomCode: null,
   cardSet: 'fibonacci',
+  timerDuration: null,
   participants: [],
   currentSession: null,
   votes: [],
@@ -55,6 +58,7 @@ export const useRoomStore = create<RoomStore>((set, get) => ({
       roomId: params.roomId,
       roomCode: params.roomCode,
       cardSet: params.cardSet,
+      timerDuration: params.timerDuration,
       participants: params.participants,
       currentSession: params.currentSession,
       votes: params.votes,
