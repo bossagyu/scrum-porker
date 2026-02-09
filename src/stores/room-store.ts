@@ -56,6 +56,8 @@ const initialState: RoomState = {
   isSubscribed: false,
 }
 
+const POLL_INTERVAL_MS = 3000
+
 export const useRoomStore = create<RoomStore>((set, get) => ({
   ...initialState,
 
@@ -79,15 +81,11 @@ export const useRoomStore = create<RoomStore>((set, get) => ({
     const sessionId = state.currentSession?.id
     if (!sessionId) return
 
-    const existing = state.votes.find(
-      (v) => v.participant_id === participantId,
-    )
+    const existing = state.votes.find((v) => v.participant_id === participantId)
     if (existing) {
       set({
         votes: state.votes.map((v) =>
-          v.participant_id === participantId
-            ? { ...v, card_value: cardValue }
-            : v,
+          v.participant_id === participantId ? { ...v, card_value: cardValue } : v,
         ),
       })
     } else {
@@ -108,106 +106,144 @@ export const useRoomStore = create<RoomStore>((set, get) => ({
 
     const supabase = createClient()
 
-    const channel = supabase
-      .channel(`room:${roomId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'participants',
-          filter: `room_id=eq.${roomId}`,
-        },
-        (payload) => {
-          const state = get()
-          if (payload.eventType === 'INSERT') {
+    const handleParticipants = (
+      eventType: string,
+      newRecord: Record<string, unknown> | null,
+      oldRecord: Record<string, unknown> | null,
+    ) => {
+      const state = get()
+      if (eventType === 'INSERT' && newRecord) {
+        const participant = newRecord as unknown as ParticipantRow
+        const exists = state.participants.some((p) => p.id === participant.id)
+        if (!exists) {
+          set({ participants: [...state.participants, participant] })
+        }
+      } else if (eventType === 'UPDATE' && newRecord) {
+        const updated = newRecord as unknown as ParticipantRow
+        set({
+          participants: state.participants.map((p) => (p.id === updated.id ? updated : p)),
+        })
+      } else if (eventType === 'DELETE' && oldRecord) {
+        const deleted = oldRecord as unknown as { id: string }
+        set({
+          participants: state.participants.filter((p) => p.id !== deleted.id),
+        })
+      }
+    }
+
+    const handleVotingSessions = (
+      eventType: string,
+      newRecord: Record<string, unknown> | null,
+    ) => {
+      if (eventType === 'INSERT' && newRecord) {
+        set({
+          currentSession: newRecord as unknown as VotingSessionRow,
+          votes: [],
+        })
+      } else if (eventType === 'UPDATE' && newRecord) {
+        set({ currentSession: newRecord as unknown as VotingSessionRow })
+      } else if (eventType === 'DELETE') {
+        set({ currentSession: null, votes: [] })
+      }
+    }
+
+    const handleVotes = (
+      eventType: string,
+      newRecord: Record<string, unknown> | null,
+      oldRecord: Record<string, unknown> | null,
+    ) => {
+      const state = get()
+      const currentSessionId = state.currentSession?.id
+      if (!currentSessionId) return
+
+      if (eventType === 'INSERT' && newRecord) {
+        const newVote = newRecord as unknown as VoteRow
+        if (newVote.session_id === currentSessionId) {
+          const hasOptimistic = state.votes.some(
+            (v) => v.participant_id === newVote.participant_id && v.id.startsWith('optimistic-'),
+          )
+          if (hasOptimistic) {
             set({
-              participants: [...state.participants, payload.new as ParticipantRow],
-            })
-          } else if (payload.eventType === 'UPDATE') {
-            const updated = payload.new as ParticipantRow
-            set({
-              participants: state.participants.map((p) =>
-                p.id === updated.id ? updated : p,
+              votes: state.votes.map((v) =>
+                v.participant_id === newVote.participant_id && v.id.startsWith('optimistic-')
+                  ? newVote
+                  : v,
               ),
             })
-          } else if (payload.eventType === 'DELETE') {
-            const deleted = payload.old as { id: string }
-            set({
-              participants: state.participants.filter((p) => p.id !== deleted.id),
-            })
+          } else {
+            const exists = state.votes.some((v) => v.id === newVote.id)
+            if (!exists) {
+              set({ votes: [...state.votes, newVote] })
+            }
           }
-        },
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'voting_sessions',
-          filter: `room_id=eq.${roomId}`,
-        },
-        (payload) => {
-          if (payload.eventType === 'INSERT') {
-            set({
-              currentSession: payload.new as VotingSessionRow,
-              votes: [],
-            })
-          } else if (payload.eventType === 'UPDATE') {
-            set({ currentSession: payload.new as VotingSessionRow })
-          }
-        },
-      )
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'votes' },
-        (payload) => {
-          const state = get()
-          const currentSessionId = state.currentSession?.id
-          if (!currentSessionId) return
+        }
+      } else if (eventType === 'UPDATE' && newRecord) {
+        const updatedVote = newRecord as unknown as VoteRow
+        if (updatedVote.session_id === currentSessionId) {
+          set({
+            votes: state.votes.map((v) =>
+              v.id === updatedVote.id ||
+              (v.id.startsWith('optimistic-') && v.participant_id === updatedVote.participant_id)
+                ? updatedVote
+                : v,
+            ),
+          })
+        }
+      } else if (eventType === 'DELETE' && oldRecord) {
+        const deleted = oldRecord as unknown as { id: string }
+        set({
+          votes: state.votes.filter((v) => v.id !== deleted.id),
+        })
+      }
+    }
 
-          if (payload.eventType === 'INSERT') {
-            const newVote = payload.new as VoteRow
-            if (newVote.session_id === currentSessionId) {
-              const hasOptimistic = state.votes.some(
-                (v) =>
-                  v.participant_id === newVote.participant_id &&
-                  v.id.startsWith('optimistic-'),
-              )
-              if (hasOptimistic) {
-                set({
-                  votes: state.votes.map((v) =>
-                    v.participant_id === newVote.participant_id &&
-                    v.id.startsWith('optimistic-')
-                      ? newVote
-                      : v,
-                  ),
-                })
-              } else {
-                set({ votes: [...state.votes, newVote] })
-              }
-            }
-          } else if (payload.eventType === 'UPDATE') {
-            const updatedVote = payload.new as VoteRow
-            if (updatedVote.session_id === currentSessionId) {
-              set({
-                votes: state.votes.map((v) =>
-                  v.id === updatedVote.id ||
-                  (v.id.startsWith('optimistic-') &&
-                    v.participant_id === updatedVote.participant_id)
-                    ? updatedVote
-                    : v,
-                ),
-              })
-            }
-          } else if (payload.eventType === 'DELETE') {
-            const deleted = payload.old as { id: string }
-            set({
-              votes: state.votes.filter((v) => v.id !== deleted.id),
-            })
-          }
-        },
-      )
+    const handleRooms = (newRecord: Record<string, unknown> | null) => {
+      if (!newRecord) return
+      const room = newRecord as unknown as {
+        card_set: string
+        timer_duration: number | null
+        auto_reveal: boolean
+        allow_all_control: boolean
+      }
+      set({
+        cardSet: room.card_set,
+        timerDuration: room.timer_duration,
+        autoReveal: room.auto_reveal,
+        allowAllControl: room.allow_all_control,
+      })
+    }
+
+    const handleBroadcast = (eventType: string, raw: Record<string, unknown>) => {
+      const inner = raw.payload as {
+        table: string
+        schema: string
+        record: Record<string, unknown> | null
+        old_record: Record<string, unknown> | null
+        operation: string
+      } | undefined
+      if (!inner || typeof inner.table !== 'string') return
+      const { table, record, old_record } = inner
+      switch (table) {
+        case 'participants':
+          handleParticipants(eventType, record, old_record)
+          break
+        case 'voting_sessions':
+          handleVotingSessions(eventType, record)
+          break
+        case 'votes':
+          handleVotes(eventType, record, old_record)
+          break
+        case 'rooms':
+          handleRooms(record)
+          break
+      }
+    }
+
+    const channel = supabase
+      .channel(`room:${roomId}`)
+      .on('broadcast', { event: 'INSERT' }, (payload) => handleBroadcast('INSERT', payload))
+      .on('broadcast', { event: 'UPDATE' }, (payload) => handleBroadcast('UPDATE', payload))
+      .on('broadcast', { event: 'DELETE' }, (payload) => handleBroadcast('DELETE', payload))
       .subscribe()
 
     const pollInterval = setInterval(async () => {
@@ -264,7 +300,7 @@ export const useRoomStore = create<RoomStore>((set, get) => ({
           allowAllControl: roomData.allow_all_control,
         })
       }
-    }, 3000)
+    }, POLL_INTERVAL_MS)
 
     set({ isSubscribed: true })
 
