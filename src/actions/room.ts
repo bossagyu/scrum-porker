@@ -8,6 +8,7 @@ const createRoomSchema = z.object({
   name: z.string().min(1, 'ルーム名を入力してください').max(100, 'ルーム名は100文字以内で入力してください'),
   cardSet: z.enum(['fibonacci', 'tshirt', 'powerOf2']),
   autoReveal: z.boolean().default(false),
+  allowAllControl: z.boolean().default(false),
   timerDuration: z
     .union([z.literal(30), z.literal(60), z.literal(120), z.literal(300), z.null()])
     .default(null),
@@ -59,6 +60,7 @@ export async function createRoom(
     name: formData.get('name'),
     cardSet: formData.get('cardSet'),
     autoReveal: formData.get('autoReveal') === 'true',
+    allowAllControl: formData.get('allowAllControl') === 'true',
     timerDuration,
     displayName: formData.get('displayName'),
   })
@@ -78,6 +80,7 @@ export async function createRoom(
       card_set: parsed.data.cardSet,
       auto_reveal: parsed.data.autoReveal,
       timer_duration: parsed.data.timerDuration,
+      allow_all_control: parsed.data.allowAllControl,
     })
     .select('*')
     .single()
@@ -176,6 +179,68 @@ export async function getRoomByCode(code: string) {
     .single()
 
   return room
+}
+
+const updateRoomSettingsSchema = z.object({
+  roomId: z.string().uuid(),
+  cardSet: z.enum(['fibonacci', 'tshirt', 'powerOf2']),
+  timerDuration: z
+    .union([z.literal(30), z.literal(60), z.literal(120), z.literal(300), z.null()])
+    .default(null),
+  autoReveal: z.boolean(),
+  allowAllControl: z.boolean(),
+})
+
+export type UpdateRoomSettingsState = {
+  readonly error?: string
+  readonly success?: boolean
+}
+
+export async function updateRoomSettings(
+  input: z.infer<typeof updateRoomSettingsSchema>,
+): Promise<UpdateRoomSettingsState> {
+  const parsed = updateRoomSettingsSchema.safeParse(input)
+  if (!parsed.success) {
+    return { error: '入力が無効です' }
+  }
+
+  try {
+    const supabase = await createServerSupabaseClient()
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (!user) return { error: '認証が必要です' }
+
+    const { data: participant } = await supabase
+      .from('participants')
+      .select('is_facilitator')
+      .eq('room_id', parsed.data.roomId)
+      .eq('user_id', user.id)
+      .single()
+
+    if (!participant?.is_facilitator) {
+      return { error: '設定を変更する権限がありません' }
+    }
+
+    const { error } = await supabase
+      .from('rooms')
+      .update({
+        card_set: parsed.data.cardSet,
+        timer_duration: parsed.data.timerDuration,
+        auto_reveal: parsed.data.autoReveal,
+        allow_all_control: parsed.data.allowAllControl,
+      })
+      .eq('id', parsed.data.roomId)
+
+    if (error) {
+      return { error: '設定の更新に失敗しました' }
+    }
+
+    return { success: true }
+  } catch {
+    return { error: '設定の更新に失敗しました' }
+  }
 }
 
 export async function getCurrentParticipant(roomId: string) {

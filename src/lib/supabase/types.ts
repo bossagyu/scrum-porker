@@ -10,6 +10,7 @@ export type Database = {
           card_set: string
           auto_reveal: boolean
           timer_duration: number | null
+          allow_all_control: boolean
           is_active: boolean
           created_at: string
           expires_at: string
@@ -22,6 +23,7 @@ export type Database = {
           card_set?: string
           auto_reveal?: boolean
           timer_duration?: number | null
+          allow_all_control?: boolean
           is_active?: boolean
           created_at?: string
           expires_at?: string
@@ -34,6 +36,7 @@ export type Database = {
           card_set?: string
           auto_reveal?: boolean
           timer_duration?: number | null
+          allow_all_control?: boolean
           is_active?: boolean
           created_at?: string
           expires_at?: string
@@ -146,6 +149,10 @@ export type Database = {
         Returns: string[]
       }
       get_my_facilitator_room_ids: {
+        Args: Record<string, never>
+        Returns: string[]
+      }
+      get_my_controllable_room_ids: {
         Args: Record<string, never>
         Returns: string[]
       }
