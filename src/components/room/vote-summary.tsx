@@ -58,7 +58,7 @@ export function VoteSummary() {
                 </span>
                 <div className="flex-1">
                   <div
-                    className="bg-primary h-6 rounded"
+                    className="bg-primary h-6 rounded transition-all duration-700 ease-out"
                     style={{
                       width:
                         maxCount > 0

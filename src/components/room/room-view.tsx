@@ -67,7 +67,7 @@ export function RoomView({
     <div className="space-y-6">
       <RoomHeader onToggleHistory={() => setShowHistory((prev) => !prev)} />
       {showHistory && <SessionHistory onClose={() => setShowHistory(false)} />}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_300px]">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-[1fr_280px] lg:grid-cols-[1fr_300px]">
         <div className="space-y-6">
           <VotingCards />
           {isRevealed && (
