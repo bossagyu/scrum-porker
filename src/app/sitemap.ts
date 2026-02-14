@@ -6,9 +6,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
       url: baseUrl,
-      lastModified: new Date('2026-02-09'),
+      lastModified: new Date('2026-02-14'),
       changeFrequency: 'monthly',
       priority: 1,
+      alternates: {
+        languages: {
+          ja: baseUrl,
+          en: baseUrl,
+        },
+      },
     },
   ]
 }
