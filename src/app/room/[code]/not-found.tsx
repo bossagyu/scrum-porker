@@ -1,20 +1,22 @@
+'use client'
+
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function RoomNotFound() {
+  const t = useTranslations()
   return (
     <div className="mx-auto max-w-md py-12">
       <Card>
         <CardHeader>
-          <CardTitle>ルームが見つかりません</CardTitle>
+          <CardTitle>{t('errors.roomNotFound')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-sm text-muted-foreground">
-            指定されたルームは存在しないか、すでに終了しています。ルームコードをご確認ください。
-          </p>
+          <p className="text-sm text-muted-foreground">{t('errors.roomNotFoundDescription')}</p>
           <Button asChild>
-            <Link href="/">ホームに戻る</Link>
+            <Link href="/">{t('common.homeLink')}</Link>
           </Button>
         </CardContent>
       </Card>
