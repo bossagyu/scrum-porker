@@ -11,6 +11,7 @@ export type Database = {
           auto_reveal: boolean
           timer_duration: number | null
           allow_all_control: boolean
+          custom_cards: string[] | null
           is_active: boolean
           created_at: string
           expires_at: string
@@ -24,6 +25,7 @@ export type Database = {
           auto_reveal?: boolean
           timer_duration?: number | null
           allow_all_control?: boolean
+          custom_cards?: string[] | null
           is_active?: boolean
           created_at?: string
           expires_at?: string
@@ -37,6 +39,7 @@ export type Database = {
           auto_reveal?: boolean
           timer_duration?: number | null
           allow_all_control?: boolean
+          custom_cards?: string[] | null
           is_active?: boolean
           created_at?: string
           expires_at?: string
