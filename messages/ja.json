@@ -8,6 +8,12 @@
     "saving": "保存中...",
     "settings": "設定"
   },
+  "theme": {
+    "light": "ライト",
+    "dark": "ダーク",
+    "system": "システム",
+    "toggle": "テーマ切替"
+  },
   "home": {
     "description": "チームでストーリーポイントを見積もるためのシンプルなツール"
   },
