@@ -3,12 +3,13 @@
 import { useState, useTransition } from 'react'
 import { useRoomStore } from '@/stores/room-store'
 import { submitVote } from '@/actions/vote'
-import { CARD_SETS, type CardSetType } from '@/lib/constants'
+import { getCardsForRoom } from '@/lib/constants'
 import { VotingCard } from './voting-card'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export function VotingCards() {
   const cardSet = useRoomStore((s) => s.cardSet)
+  const customCards = useRoomStore((s) => s.customCards)
   const currentSession = useRoomStore((s) => s.currentSession)
   const currentParticipantId = useRoomStore((s) => s.currentParticipantId)
   const votes = useRoomStore((s) => s.votes)
@@ -23,7 +24,7 @@ export function VotingCards() {
   )
   const isObserver = currentParticipant?.is_observer ?? false
 
-  const cards = CARD_SETS[cardSet as CardSetType]?.cards ?? CARD_SETS.fibonacci.cards
+  const cards = getCardsForRoom(cardSet, customCards)
 
   const currentVote = votes.find(
     (v) => v.participant_id === currentParticipantId,

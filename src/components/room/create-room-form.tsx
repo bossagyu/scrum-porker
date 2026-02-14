@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState, useEffect } from 'react'
+import { useActionState, useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -14,10 +14,12 @@ const cardSetOptions: readonly { readonly value: CardSetType; readonly label: st
   { value: 'fibonacci', label: CARD_SETS.fibonacci.name },
   { value: 'tshirt', label: CARD_SETS.tshirt.name },
   { value: 'powerOf2', label: CARD_SETS.powerOf2.name },
+  { value: 'custom', label: CARD_SETS.custom.name },
 ]
 
 export function CreateRoomForm() {
   const [state, formAction, isPending] = useActionState(createRoom, initialState)
+  const [selectedCardSet, setSelectedCardSet] = useState<CardSetType>('fibonacci')
 
   useEffect(() => {
     if (state.redirectTo) {
@@ -67,18 +69,30 @@ export function CreateRoomForm() {
                     type="radio"
                     name="cardSet"
                     value={option.value}
-                    defaultChecked={option.value === 'fibonacci'}
+                    checked={selectedCardSet === option.value}
+                    onChange={(e) => setSelectedCardSet(e.target.value as CardSetType)}
                     className="accent-primary"
                   />
-                  <div>
+                  <div className="flex-1">
                     <div className="text-sm font-medium">{option.label}</div>
                     <div className="text-xs text-muted-foreground">
-                      {CARD_SETS[option.value].cards.join(', ')}
+                      {option.value === 'custom'
+                        ? '数値をカンマ区切りで入力'
+                        : CARD_SETS[option.value].cards.join(', ')}
                     </div>
                   </div>
                 </label>
               ))}
             </div>
+            {selectedCardSet === 'custom' && (
+              <div className="mt-2">
+                <Input
+                  name="customCards"
+                  placeholder="0.5, 1, 2, 3, 5, 8"
+                  className="w-full"
+                />
+              </div>
+            )}
           </div>
 
           <div className="space-y-2">

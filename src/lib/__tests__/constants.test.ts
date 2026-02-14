@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { CARD_SETS, SPECIAL_CARDS } from '../constants'
+import { CARD_SETS, SPECIAL_CARDS, getCardsForRoom } from '../constants'
 
 describe('CARD_SETS', () => {
   describe('fibonacci', () => {
@@ -56,5 +56,33 @@ describe('SPECIAL_CARDS', () => {
 
   it('has exactly 3 special cards', () => {
     expect(SPECIAL_CARDS).toHaveLength(3)
+  })
+})
+
+describe('getCardsForRoom', () => {
+  it('returns preset cards for fibonacci', () => {
+    expect(getCardsForRoom('fibonacci', null)).toEqual(CARD_SETS.fibonacci.cards)
+  })
+
+  it('returns preset cards for tshirt', () => {
+    expect(getCardsForRoom('tshirt', null)).toEqual(CARD_SETS.tshirt.cards)
+  })
+
+  it('returns custom cards + special cards when cardSet is custom', () => {
+    const customCards = ['1', '2', '3', '5', '8']
+    const result = getCardsForRoom('custom', customCards)
+    expect(result).toEqual(['1', '2', '3', '5', '8', '?', '∞', '☕'])
+  })
+
+  it('falls back to fibonacci when custom has empty array', () => {
+    expect(getCardsForRoom('custom', [])).toEqual(CARD_SETS.fibonacci.cards)
+  })
+
+  it('falls back to fibonacci when custom has null', () => {
+    expect(getCardsForRoom('custom', null)).toEqual(CARD_SETS.fibonacci.cards)
+  })
+
+  it('falls back to fibonacci for unknown card set', () => {
+    expect(getCardsForRoom('unknown', null)).toEqual(CARD_SETS.fibonacci.cards)
   })
 })

@@ -6,6 +6,7 @@ import { updateRoomSettings } from '@/actions/room'
 import { CARD_SETS, type CardSetType, TIMER_OPTIONS } from '@/lib/constants'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
 import {
   Dialog,
   DialogContent,
@@ -18,16 +19,21 @@ const cardSetOptions: readonly { readonly value: CardSetType; readonly label: st
   { value: 'fibonacci', label: CARD_SETS.fibonacci.name },
   { value: 'tshirt', label: CARD_SETS.tshirt.name },
   { value: 'powerOf2', label: CARD_SETS.powerOf2.name },
+  { value: 'custom', label: CARD_SETS.custom.name },
 ]
 
 export function RoomSettingsDialog() {
   const roomId = useRoomStore((s) => s.roomId)
   const currentCardSet = useRoomStore((s) => s.cardSet)
+  const currentCustomCards = useRoomStore((s) => s.customCards)
   const currentTimerDuration = useRoomStore((s) => s.timerDuration)
   const currentAutoReveal = useRoomStore((s) => s.autoReveal)
   const currentAllowAllControl = useRoomStore((s) => s.allowAllControl)
 
   const [cardSet, setCardSet] = useState(currentCardSet)
+  const [customCardsInput, setCustomCardsInput] = useState(
+    currentCustomCards ? currentCustomCards.join(', ') : '',
+  )
   const [timerDuration, setTimerDuration] = useState<number | null>(currentTimerDuration)
   const [autoReveal, setAutoReveal] = useState(currentAutoReveal)
   const [allowAllControl, setAllowAllControl] = useState(currentAllowAllControl)
@@ -38,6 +44,7 @@ export function RoomSettingsDialog() {
   const handleOpenChange = (newOpen: boolean) => {
     if (newOpen) {
       setCardSet(currentCardSet)
+      setCustomCardsInput(currentCustomCards ? currentCustomCards.join(', ') : '')
       setTimerDuration(currentTimerDuration)
       setAutoReveal(currentAutoReveal)
       setAllowAllControl(currentAllowAllControl)
@@ -49,9 +56,18 @@ export function RoomSettingsDialog() {
   const handleSave = () => {
     if (!roomId) return
     startTransition(async () => {
+      const customCards =
+        cardSet === 'custom' && customCardsInput.trim()
+          ? customCardsInput
+              .split(',')
+              .map((card) => card.trim())
+              .filter((card) => card.length > 0)
+          : null
+
       const result = await updateRoomSettings({
         roomId,
-        cardSet: cardSet as 'fibonacci' | 'tshirt' | 'powerOf2',
+        cardSet: cardSet as 'fibonacci' | 'tshirt' | 'powerOf2' | 'custom',
+        customCards: customCards ?? undefined,
         timerDuration: timerDuration as 30 | 60 | 120 | 300 | null,
         autoReveal,
         allowAllControl,
@@ -92,15 +108,32 @@ export function RoomSettingsDialog() {
                     onChange={() => setCardSet(option.value)}
                     className="accent-primary"
                   />
-                  <div>
+                  <div className="flex-1">
                     <div className="text-sm font-medium">{option.label}</div>
-                    <div className="text-xs text-muted-foreground">
-                      {CARD_SETS[option.value].cards.join(', ')}
-                    </div>
+                    {option.value !== 'custom' && (
+                      <div className="text-xs text-muted-foreground">
+                        {CARD_SETS[option.value].cards.join(', ')}
+                      </div>
+                    )}
                   </div>
                 </label>
               ))}
             </div>
+            {cardSet === 'custom' && (
+              <div className="space-y-2 pt-2">
+                <Label htmlFor="customCardsInput">カスタムカード（カンマ区切り）</Label>
+                <Input
+                  id="customCardsInput"
+                  type="text"
+                  placeholder="例: 1, 2, 3, 5, 8, 13"
+                  value={customCardsInput}
+                  onChange={(e) => setCustomCardsInput(e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground">
+                  特殊カード（?, ∞, ☕）は自動的に追加されます
+                </p>
+              </div>
+            )}
           </div>
 
           <div className="space-y-2">

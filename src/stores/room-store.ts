@@ -15,6 +15,7 @@ type RoomState = {
   readonly timerDuration: number | null
   readonly autoReveal: boolean
   readonly allowAllControl: boolean
+  readonly customCards: string[] | null
   readonly participants: readonly ParticipantRow[]
   readonly currentSession: VotingSessionRow | null
   readonly votes: readonly VoteRow[]
@@ -30,6 +31,7 @@ type RoomActions = {
     readonly timerDuration: number | null
     readonly autoReveal: boolean
     readonly allowAllControl: boolean
+    readonly customCards: string[] | null
     readonly participants: readonly ParticipantRow[]
     readonly currentSession: VotingSessionRow | null
     readonly votes: readonly VoteRow[]
@@ -49,6 +51,7 @@ const initialState: RoomState = {
   timerDuration: null,
   autoReveal: false,
   allowAllControl: false,
+  customCards: null,
   participants: [],
   currentSession: null,
   votes: [],
@@ -69,6 +72,7 @@ export const useRoomStore = create<RoomStore>((set, get) => ({
       timerDuration: params.timerDuration,
       autoReveal: params.autoReveal,
       allowAllControl: params.allowAllControl,
+      customCards: params.customCards,
       participants: params.participants,
       currentSession: params.currentSession,
       votes: params.votes,
@@ -204,12 +208,14 @@ export const useRoomStore = create<RoomStore>((set, get) => ({
         timer_duration: number | null
         auto_reveal: boolean
         allow_all_control: boolean
+        custom_cards: string[] | null
       }
       set({
         cardSet: room.card_set,
         timerDuration: room.timer_duration,
         autoReveal: room.auto_reveal,
         allowAllControl: room.allow_all_control,
+        customCards: room.custom_cards,
       })
     }
 
@@ -288,7 +294,7 @@ export const useRoomStore = create<RoomStore>((set, get) => ({
 
       const { data: roomData } = await supabase
         .from('rooms')
-        .select('card_set, timer_duration, auto_reveal, allow_all_control')
+        .select('card_set, timer_duration, auto_reveal, allow_all_control, custom_cards')
         .eq('id', roomId)
         .single()
 
@@ -298,6 +304,7 @@ export const useRoomStore = create<RoomStore>((set, get) => ({
           timerDuration: roomData.timer_duration,
           autoReveal: roomData.auto_reveal,
           allowAllControl: roomData.allow_all_control,
+          customCards: roomData.custom_cards,
         })
       }
     }, POLL_INTERVAL_MS)

@@ -47,4 +47,37 @@ test.describe('Room Creation', () => {
 
     await expect(page.locator('#displayName')).toHaveAttribute('required', '')
   })
+
+  test('should create a room with custom card set', async ({ page }) => {
+    await page.goto('/')
+    await page.locator('#name').fill('Custom Cards Room')
+    await page.locator('#displayName').fill('CustomUser')
+
+    // Select custom card set
+    await page.locator('input[name="cardSet"][value="custom"]').check()
+
+    // Enter custom card values
+    await page.locator('input[name="customCards"]').fill('1, 2, 3, 5, 8, 13')
+
+    await page.getByRole('button', { name: 'ルームを作成' }).click()
+
+    await page.waitForURL(/\/room\/[A-Z0-9]{6}$/)
+
+    // Verify custom cards are displayed
+    await expect(page.getByRole('button', { name: '1', exact: true })).toBeVisible()
+    await expect(page.getByRole('button', { name: '2', exact: true })).toBeVisible()
+    await expect(page.getByRole('button', { name: '3', exact: true })).toBeVisible()
+    await expect(page.getByRole('button', { name: '5', exact: true })).toBeVisible()
+    await expect(page.getByRole('button', { name: '8', exact: true })).toBeVisible()
+    await expect(page.getByRole('button', { name: '13', exact: true })).toBeVisible()
+
+    // Verify special cards are also present
+    await expect(page.getByRole('button', { name: '?', exact: true })).toBeVisible()
+    await expect(page.getByRole('button', { name: '∞', exact: true })).toBeVisible()
+    await expect(page.getByRole('button', { name: '☕', exact: true })).toBeVisible()
+
+    // Verify that fibonacci-only cards like 21, 34 are NOT present
+    await expect(page.getByRole('button', { name: '21', exact: true })).not.toBeVisible()
+    await expect(page.getByRole('button', { name: '34', exact: true })).not.toBeVisible()
+  })
 })
