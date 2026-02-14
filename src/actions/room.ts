@@ -28,11 +28,11 @@ const createRoomSchema = z.object({
     if (!data.customCards || data.customCards.length < 2 || data.customCards.length > 20) {
       return false
     }
-    return data.customCards.every((card) => /^\d+$/.test(card))
+    return data.customCards.every((card) => !isNaN(Number(card)))
   }
   return true
 }, {
-  message: 'カスタムカードは2〜20枚の数値のみを入力してください',
+  message: 'カスタムカードは2〜20枚の数値をカンマ区切りで入力してください',
   path: ['customCards'],
 })
 
@@ -215,11 +215,11 @@ const updateRoomSettingsSchema = z.object({
     if (!data.customCards || data.customCards.length < 2 || data.customCards.length > 20) {
       return false
     }
-    return data.customCards.every((card) => /^\d+$/.test(card))
+    return data.customCards.every((card) => !isNaN(Number(card)))
   }
   return true
 }, {
-  message: 'カスタムカードは2〜20枚の数値のみを入力してください',
+  message: 'カスタムカードは2〜20枚の数値をカンマ区切りで入力してください',
   path: ['customCards'],
 })
 

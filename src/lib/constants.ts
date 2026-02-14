@@ -27,8 +27,11 @@ export function getCardsForRoom(
   cardSet: string,
   customCards: string[] | null,
 ): readonly string[] {
-  if (cardSet === 'custom' && customCards && customCards.length > 0) {
-    return [...customCards, ...SPECIAL_CARDS]
+  if (cardSet === 'custom') {
+    if (customCards && customCards.length > 0) {
+      return [...customCards, ...SPECIAL_CARDS]
+    }
+    return CARD_SETS.fibonacci.cards
   }
   const preset = CARD_SETS[cardSet as CardSetType]
   return preset ? preset.cards : CARD_SETS.fibonacci.cards

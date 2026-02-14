@@ -67,7 +67,7 @@ export function RoomSettingsDialog() {
       const result = await updateRoomSettings({
         roomId,
         cardSet: cardSet as 'fibonacci' | 'tshirt' | 'powerOf2' | 'custom',
-        customCards,
+        customCards: customCards ?? undefined,
         timerDuration: timerDuration as 30 | 60 | 120 | 300 | null,
         autoReveal,
         allowAllControl,
