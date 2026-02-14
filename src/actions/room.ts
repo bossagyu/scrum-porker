@@ -6,7 +6,14 @@ import { generateRoomCode } from '@/lib/room-utils'
 
 const createRoomSchema = z.object({
   name: z.string().min(1, 'ルーム名を入力してください').max(100, 'ルーム名は100文字以内で入力してください'),
-  cardSet: z.enum(['fibonacci', 'tshirt', 'powerOf2']),
+  cardSet: z.enum(['fibonacci', 'tshirt', 'powerOf2', 'custom']),
+  customCards: z
+    .string()
+    .optional()
+    .transform((val) => {
+      if (!val) return undefined
+      return val.split(',').map((v) => v.trim()).filter(Boolean)
+    }),
   autoReveal: z.boolean().default(false),
   allowAllControl: z.boolean().default(false),
   timerDuration: z
@@ -16,6 +23,17 @@ const createRoomSchema = z.object({
     .string()
     .min(1, '表示名を入力してください')
     .max(20, '表示名は20文字以内で入力してください'),
+}).refine((data) => {
+  if (data.cardSet === 'custom') {
+    if (!data.customCards || data.customCards.length < 2 || data.customCards.length > 20) {
+      return false
+    }
+    return data.customCards.every((card) => /^\d+$/.test(card))
+  }
+  return true
+}, {
+  message: 'カスタムカードは2〜20枚の数値のみを入力してください',
+  path: ['customCards'],
 })
 
 const joinRoomSchema = z.object({
@@ -59,6 +77,7 @@ export async function createRoom(
   const parsed = createRoomSchema.safeParse({
     name: formData.get('name'),
     cardSet: formData.get('cardSet'),
+    customCards: formData.get('customCards') || undefined,
     autoReveal: formData.get('autoReveal') === 'true',
     allowAllControl: formData.get('allowAllControl') === 'true',
     timerDuration,
@@ -78,6 +97,7 @@ export async function createRoom(
       name: parsed.data.name,
       created_by: userId!,
       card_set: parsed.data.cardSet,
+      custom_cards: parsed.data.cardSet === 'custom' ? parsed.data.customCards : null,
       auto_reveal: parsed.data.autoReveal,
       timer_duration: parsed.data.timerDuration,
       allow_all_control: parsed.data.allowAllControl,
@@ -183,12 +203,24 @@ export async function getRoomByCode(code: string) {
 
 const updateRoomSettingsSchema = z.object({
   roomId: z.string().uuid(),
-  cardSet: z.enum(['fibonacci', 'tshirt', 'powerOf2']),
+  cardSet: z.enum(['fibonacci', 'tshirt', 'powerOf2', 'custom']),
+  customCards: z.array(z.string()).optional(),
   timerDuration: z
     .union([z.literal(30), z.literal(60), z.literal(120), z.literal(300), z.null()])
     .default(null),
   autoReveal: z.boolean(),
   allowAllControl: z.boolean(),
+}).refine((data) => {
+  if (data.cardSet === 'custom') {
+    if (!data.customCards || data.customCards.length < 2 || data.customCards.length > 20) {
+      return false
+    }
+    return data.customCards.every((card) => /^\d+$/.test(card))
+  }
+  return true
+}, {
+  message: 'カスタムカードは2〜20枚の数値のみを入力してください',
+  path: ['customCards'],
 })
 
 export type UpdateRoomSettingsState = {
@@ -227,6 +259,7 @@ export async function updateRoomSettings(
       .from('rooms')
       .update({
         card_set: parsed.data.cardSet,
+        custom_cards: parsed.data.cardSet === 'custom' ? parsed.data.customCards : null,
         timer_duration: parsed.data.timerDuration,
         auto_reveal: parsed.data.autoReveal,
         allow_all_control: parsed.data.allowAllControl,
