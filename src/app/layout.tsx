@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Script from 'next/script'
 import { Header } from '@/components/layout/header'
 import './globals.css'
 
@@ -38,6 +39,20 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ja">
+      <head>
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-LKL6BQNC8V"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-LKL6BQNC8V');
+          `}
+        </Script>
+      </head>
       <body className="min-h-screen bg-background antialiased">
         <Header />
         <main className="container mx-auto px-4 py-8">{children}</main>
