@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useEffect, useState, useTransition } from 'react'
 import { useRoomStore } from '@/stores/room-store'
 import { submitVote } from '@/actions/vote'
 import { getCardsForRoom } from '@/lib/constants'
@@ -16,6 +16,10 @@ export function VotingCards() {
   const participants = useRoomStore((s) => s.participants)
   const [isPending, startTransition] = useTransition()
   const [selectedCard, setSelectedCard] = useState<string | null>(null)
+
+  useEffect(() => {
+    setSelectedCard(null)
+  }, [currentSession?.id])
 
   const isRevealed = currentSession?.is_revealed ?? false
   const hasSession = currentSession !== null
