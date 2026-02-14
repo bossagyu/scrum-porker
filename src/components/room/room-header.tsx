@@ -1,6 +1,7 @@
 'use client'
 
 import { useTransition } from 'react'
+import { useTranslations } from 'next-intl'
 import { useRoomStore } from '@/stores/room-store'
 import { revealVotes, resetVoting } from '@/actions/vote'
 import { Button } from '@/components/ui/button'
@@ -12,6 +13,7 @@ type RoomHeaderProps = {
 }
 
 export function RoomHeader({ onToggleHistory }: RoomHeaderProps) {
+  const t = useTranslations()
   const roomCode = useRoomStore((s) => s.roomCode)
   const roomId = useRoomStore((s) => s.roomId)
   const currentSession = useRoomStore((s) => s.currentSession)
@@ -56,18 +58,18 @@ export function RoomHeader({ onToggleHistory }: RoomHeaderProps) {
       <div className="flex gap-2">
         {isFacilitator && <RoomSettingsDialog />}
         <Button variant="outline" size="sm" onClick={onToggleHistory}>
-          履歴
+          {t('roomHeader.history')}
         </Button>
         {(isFacilitator || allowAllControl) && (
           <>
             {!isRevealed && currentSession && (
               <Button onClick={handleReveal} disabled={isPending}>
-                結果を公開
+                {t('roomHeader.reveal')}
               </Button>
             )}
             {isRevealed && (
               <Button onClick={handleReset} disabled={isPending} variant="outline">
-                次のラウンド
+                {t('roomHeader.nextRound')}
               </Button>
             )}
           </>

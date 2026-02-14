@@ -1,9 +1,11 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useRoomStore } from '@/stores/room-store'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export function VoteResult() {
+  const t = useTranslations()
   const participants = useRoomStore((s) => s.participants)
   const votes = useRoomStore((s) => s.votes)
 
@@ -16,7 +18,7 @@ export function VoteResult() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>投票結果</CardTitle>
+        <CardTitle>{t('voting.result')}</CardTitle>
       </CardHeader>
       <CardContent>
         <ul className="space-y-2">

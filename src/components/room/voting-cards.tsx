@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useTransition } from 'react'
+import { useTranslations } from 'next-intl'
 import { useRoomStore } from '@/stores/room-store'
 import { submitVote } from '@/actions/vote'
 import { getCardsForRoom } from '@/lib/constants'
@@ -8,6 +9,7 @@ import { VotingCard } from './voting-card'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export function VotingCards() {
+  const t = useTranslations()
   const cardSet = useRoomStore((s) => s.cardSet)
   const customCards = useRoomStore((s) => s.customCards)
   const currentSession = useRoomStore((s) => s.currentSession)
@@ -53,7 +55,7 @@ export function VotingCards() {
       <Card>
         <CardContent className="py-8 text-center">
           <p className="text-muted-foreground">
-            オブザーバーは投票できません
+            {t('voting.observerCannotVote')}
           </p>
         </CardContent>
       </Card>
@@ -65,7 +67,7 @@ export function VotingCards() {
       <Card>
         <CardContent className="py-8 text-center">
           <p className="text-muted-foreground">
-            投票セッションがまだ開始されていません
+            {t('voting.noSession')}
           </p>
         </CardContent>
       </Card>
@@ -75,7 +77,7 @@ export function VotingCards() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>カードを選択</CardTitle>
+        <CardTitle>{t('voting.selectCard')}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="flex flex-wrap gap-3">

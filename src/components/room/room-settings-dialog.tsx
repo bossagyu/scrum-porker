@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { useTranslations } from 'next-intl'
 import { useRoomStore } from '@/stores/room-store'
 import { updateRoomSettings } from '@/actions/room'
 import { CARD_SETS, type CardSetType, TIMER_OPTIONS } from '@/lib/constants'
@@ -15,14 +16,22 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 
-const cardSetOptions: readonly { readonly value: CardSetType; readonly label: string }[] = [
-  { value: 'fibonacci', label: CARD_SETS.fibonacci.name },
-  { value: 'tshirt', label: CARD_SETS.tshirt.name },
-  { value: 'powerOf2', label: CARD_SETS.powerOf2.name },
-  { value: 'custom', label: CARD_SETS.custom.name },
-]
-
 export function RoomSettingsDialog() {
+  const t = useTranslations()
+
+  const cardSetOptions = [
+    { value: 'fibonacci' as const, label: t('cardSets.fibonacci') },
+    { value: 'tshirt' as const, label: t('cardSets.tshirt') },
+    { value: 'powerOf2' as const, label: t('cardSets.powerOf2') },
+    { value: 'custom' as const, label: t('cardSets.custom') },
+  ]
+
+  function getTimerLabel(option: (typeof TIMER_OPTIONS)[number]): string {
+    if (option.value === null) return t('timer.none')
+    if (option.value < 60) return t('timer.seconds', { value: option.value })
+    return t('timer.minutes', { value: option.value / 60 })
+  }
+
   const roomId = useRoomStore((s) => s.roomId)
   const currentCardSet = useRoomStore((s) => s.cardSet)
   const currentCustomCards = useRoomStore((s) => s.customCards)
@@ -84,16 +93,16 @@ export function RoomSettingsDialog() {
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
-          設定
+          {t('common.settings')}
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>ルーム設定</DialogTitle>
+          <DialogTitle>{t('roomSettings.title')}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label>カードセット</Label>
+            <Label>{t('createRoom.cardSet')}</Label>
             <div className="grid gap-2">
               {cardSetOptions.map((option) => (
                 <label
@@ -121,27 +130,27 @@ export function RoomSettingsDialog() {
             </div>
             {cardSet === 'custom' && (
               <div className="space-y-2 pt-2">
-                <Label htmlFor="customCardsInput">カスタムカード（カンマ区切り）</Label>
+                <Label htmlFor="customCardsInput">{t('cardSets.customCardLabel')}</Label>
                 <Input
                   id="customCardsInput"
                   type="text"
-                  placeholder="例: 1, 2, 3, 5, 8, 13"
+                  placeholder={t('cardSets.customCardPlaceholder')}
                   value={customCardsInput}
                   onChange={(e) => setCustomCardsInput(e.target.value)}
                 />
                 <p className="text-xs text-muted-foreground">
-                  特殊カード（?, ∞, ☕）は自動的に追加されます
+                  {t('cardSets.specialCardsNote')}
                 </p>
               </div>
             )}
           </div>
 
           <div className="space-y-2">
-            <Label>タイマー</Label>
+            <Label>{t('createRoom.timer')}</Label>
             <div className="flex flex-wrap gap-2">
               {TIMER_OPTIONS.map((option) => (
                 <label
-                  key={option.label}
+                  key={option.labelKey}
                   className="flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2 hover:bg-accent"
                 >
                   <input
@@ -151,7 +160,7 @@ export function RoomSettingsDialog() {
                     onChange={() => setTimerDuration(option.value)}
                     className="accent-primary"
                   />
-                  <span className="text-sm">{option.label}</span>
+                  <span className="text-sm">{getTimerLabel(option)}</span>
                 </label>
               ))}
             </div>
@@ -165,7 +174,7 @@ export function RoomSettingsDialog() {
               onChange={(e) => setAutoReveal(e.target.checked)}
               className="accent-primary"
             />
-            <Label htmlFor="settingsAutoReveal">全員投票後に自動で結果を表示</Label>
+            <Label htmlFor="settingsAutoReveal">{t('createRoom.autoReveal')}</Label>
           </div>
 
           <div className="flex items-center gap-2">
@@ -177,7 +186,7 @@ export function RoomSettingsDialog() {
               className="accent-primary"
             />
             <Label htmlFor="settingsAllowAllControl">
-              全員が結果の公開・次のラウンドを操作可能
+              {t('createRoom.allowAllControl')}
             </Label>
           </div>
 
@@ -188,7 +197,7 @@ export function RoomSettingsDialog() {
           )}
 
           <Button onClick={handleSave} className="w-full" disabled={isPending}>
-            {isPending ? '保存中...' : '保存'}
+            {isPending ? t('common.saving') : t('common.save')}
           </Button>
         </div>
       </DialogContent>

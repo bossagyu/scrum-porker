@@ -3,8 +3,8 @@ import { CARD_SETS, SPECIAL_CARDS, getCardsForRoom } from '../constants'
 
 describe('CARD_SETS', () => {
   describe('fibonacci', () => {
-    it('has the correct name', () => {
-      expect(CARD_SETS.fibonacci.name).toBe('フィボナッチ数列')
+    it('has the correct nameKey', () => {
+      expect(CARD_SETS.fibonacci.nameKey).toBe('cardSets.fibonacci')
     })
 
     it('has the correct cards', () => {
@@ -15,8 +15,8 @@ describe('CARD_SETS', () => {
   })
 
   describe('tshirt', () => {
-    it('has the correct name', () => {
-      expect(CARD_SETS.tshirt.name).toBe('Tシャツサイズ')
+    it('has the correct nameKey', () => {
+      expect(CARD_SETS.tshirt.nameKey).toBe('cardSets.tshirt')
     })
 
     it('has the correct cards', () => {
@@ -27,8 +27,8 @@ describe('CARD_SETS', () => {
   })
 
   describe('powerOf2', () => {
-    it('has the correct name', () => {
-      expect(CARD_SETS.powerOf2.name).toBe('2のべき乗')
+    it('has the correct nameKey', () => {
+      expect(CARD_SETS.powerOf2.nameKey).toBe('cardSets.powerOf2')
     })
 
     it('has the correct cards', () => {
@@ -38,11 +38,11 @@ describe('CARD_SETS', () => {
     })
   })
 
-  it('all card sets have a name property', () => {
+  it('all card sets have a nameKey property', () => {
     for (const key of Object.keys(CARD_SETS) as (keyof typeof CARD_SETS)[]) {
-      expect(CARD_SETS[key].name).toBeDefined()
-      expect(typeof CARD_SETS[key].name).toBe('string')
-      expect(CARD_SETS[key].name.length).toBeGreaterThan(0)
+      expect(CARD_SETS[key].nameKey).toBeDefined()
+      expect(typeof CARD_SETS[key].nameKey).toBe('string')
+      expect(CARD_SETS[key].nameKey.length).toBeGreaterThan(0)
     }
   })
 })

@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
@@ -9,20 +10,19 @@ type ErrorPageProps = {
 }
 
 export default function ErrorPage({ reset }: ErrorPageProps) {
+  const t = useTranslations()
   return (
     <div className="mx-auto max-w-md py-12">
       <Card>
         <CardHeader>
-          <CardTitle>エラーが発生しました</CardTitle>
+          <CardTitle>{t('errors.unexpected')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-sm text-muted-foreground">
-            予期しないエラーが発生しました。もう一度お試しください。
-          </p>
+          <p className="text-sm text-muted-foreground">{t('errors.unexpectedDescription')}</p>
           <div className="flex gap-2">
-            <Button onClick={reset}>再試行</Button>
+            <Button onClick={reset}>{t('common.retry')}</Button>
             <Button variant="outline" onClick={() => (window.location.href = '/')}>
-              ホームに戻る
+              {t('common.homeLink')}
             </Button>
           </div>
         </CardContent>

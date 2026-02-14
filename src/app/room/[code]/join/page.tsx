@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getRoomByCode } from '@/actions/room'
 import { JoinRoomForm } from '@/components/room/join-room-form'
-import { CARD_SETS, type CardSetType } from '@/lib/constants'
+import { CardSetLabel } from '@/components/room/card-set-label'
 
 type JoinPageProps = {
   readonly params: Promise<{ code: string }>
@@ -24,13 +24,11 @@ export default async function JoinPage({ params }: JoinPageProps) {
     notFound()
   }
 
-  const cardSetName = CARD_SETS[room.card_set as CardSetType]?.name ?? room.card_set
-
   return (
     <div className="mx-auto max-w-md space-y-6">
       <section className="space-y-2 text-center">
         <h1 className="text-2xl font-bold">{room.name}</h1>
-        <p className="text-sm text-muted-foreground">カードセット: {cardSetName}</p>
+        <CardSetLabel cardSet={room.card_set} />
       </section>
 
       <JoinRoomForm defaultRoomCode={code.toUpperCase()} roomName={room.name} />

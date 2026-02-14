@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Script from 'next/script'
 import { Header } from '@/components/layout/header'
+import { I18nProvider } from '@/i18n/client'
 import './globals.css'
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000'
@@ -54,8 +55,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </Script>
       </head>
       <body className="min-h-screen bg-background antialiased">
-        <Header />
-        <main className="container mx-auto px-4 py-8">{children}</main>
+        <I18nProvider>
+          <Header />
+          <main className="container mx-auto px-4 py-8">{children}</main>
+        </I18nProvider>
       </body>
     </html>
   )

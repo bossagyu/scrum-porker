@@ -1,0 +1,135 @@
+{
+  "common": {
+    "appName": "Scrum Poker",
+    "homeLink": "ホームに戻る",
+    "retry": "再試行",
+    "close": "閉じる",
+    "save": "保存",
+    "saving": "保存中...",
+    "settings": "設定"
+  },
+  "home": {
+    "description": "チームでストーリーポイントを見積もるためのシンプルなツール"
+  },
+  "createRoom": {
+    "title": "ルームを作成",
+    "description": "新しいスクラムポーカールームを作成します",
+    "roomName": "ルーム名",
+    "roomNamePlaceholder": "スプリント計画",
+    "displayName": "表示名",
+    "displayNamePlaceholder": "あなたの名前",
+    "cardSet": "カードセット",
+    "customCardHint": "数値をカンマ区切りで入力",
+    "timer": "タイマー",
+    "autoReveal": "全員投票後に自動で結果を表示",
+    "allowAllControl": "全員が結果の公開・次のラウンドを操作可能",
+    "submit": "ルームを作成",
+    "submitting": "作成中..."
+  },
+  "joinRoom": {
+    "title": "ルームに参加",
+    "description": "ルームコードを入力して参加します",
+    "descriptionWithName": "「{roomName}」に参加します",
+    "roomCode": "ルームコード",
+    "displayName": "表示名",
+    "displayNamePlaceholder": "あなたの名前",
+    "submit": "ルームに参加",
+    "submitting": "参加中...",
+    "cardSet": "カードセット: {name}"
+  },
+  "voting": {
+    "selectCard": "カードを選択",
+    "observerCannotVote": "オブザーバーは投票できません",
+    "noSession": "投票セッションがまだ開始されていません",
+    "result": "投票結果"
+  },
+  "cardSets": {
+    "fibonacci": "フィボナッチ数列",
+    "tshirt": "Tシャツサイズ",
+    "powerOf2": "2のべき乗",
+    "custom": "カスタム",
+    "customCardLabel": "カスタムカード（カンマ区切り）",
+    "customCardPlaceholder": "例: 1, 2, 3, 5, 8, 13",
+    "specialCardsNote": "特殊カード（?, ∞, ☕）は自動的に追加されます"
+  },
+  "timer": {
+    "none": "なし",
+    "seconds": "{value}秒",
+    "minutes": "{value}分",
+    "remaining": "残り時間 {time}"
+  },
+  "participant": {
+    "title": "参加者 ({count})",
+    "facilitator": "ファシリテーター",
+    "observer": "オブザーバー",
+    "voted": "投票済み",
+    "notVoted": "未投票"
+  },
+  "roomHeader": {
+    "reveal": "結果を公開",
+    "nextRound": "次のラウンド",
+    "history": "履歴"
+  },
+  "roomSettings": {
+    "title": "ルーム設定"
+  },
+  "history": {
+    "title": "セッション履歴",
+    "empty": "まだ公開済みのラウンドはありません",
+    "round": "ラウンド {number}",
+    "average": "平均: {value}"
+  },
+  "statistics": {
+    "title": "統計",
+    "average": "平均",
+    "median": "中央値",
+    "mode": "最頻値",
+    "distribution": "分布"
+  },
+  "export": {
+    "csvHeader": "ラウンド,トピック,日時,参加者,投票値",
+    "noTopic": "(トピックなし)"
+  },
+  "errors": {
+    "roomLoadFailed": "ルームの読み込みに失敗しました",
+    "roomLoadDescription": "ルーム情報の取得中にエラーが発生しました。ルームが存在しないか、接続に問題がある可能性があります。",
+    "roomNotFound": "ルームが見つかりません",
+    "roomNotFoundDescription": "指定されたルームは存在しないか、すでに終了しています。ルームコードをご確認ください。",
+    "pageNotFound": "ページが見つかりません",
+    "pageNotFoundDescription": "お探しのページは存在しないか、移動した可能性があります。",
+    "unexpected": "エラーが発生しました",
+    "unexpectedDescription": "予期しないエラーが発生しました。もう一度お試しください。",
+    "auth": "認証に失敗しました",
+    "roomCreate": "ルームの作成に失敗しました",
+    "participantRegister": "参加者の登録に失敗しました",
+    "roomNotFoundAction": "ルームが見つかりません",
+    "joinFailed": "ルームへの参加に失敗しました",
+    "duplicateDisplayName": "この表示名は既に使われています",
+    "invalidInput": "入力が無効です",
+    "authRequired": "認証が必要です",
+    "permissionDenied": "設定を変更する権限がありません",
+    "settingsUpdate": "設定の更新に失敗しました",
+    "vote": "投票に失敗しました",
+    "reveal": "結果の公開に失敗しました",
+    "timerReveal": "タイマー公開に失敗しました",
+    "reset": "リセットに失敗しました",
+    "historyFetch": "履歴の取得に失敗しました",
+    "invalidSession": "無効なセッションIDです",
+    "invalidRoom": "無効なルームIDです",
+    "unknown": "不明"
+  },
+  "validation": {
+    "roomNameRequired": "ルーム名を入力してください",
+    "roomNameMax": "ルーム名は100文字以内で入力してください",
+    "displayNameRequired": "表示名を入力してください",
+    "displayNameMax": "表示名は20文字以内で入力してください",
+    "roomCodeRequired": "ルームコードを入力してください",
+    "customCardsInvalid": "カスタムカードは2〜20枚の数値をカンマ区切りで入力してください"
+  },
+  "metadata": {
+    "description": "シンプルで使いやすいスクラムポーカーツール。リアルタイムでチームのストーリーポイント見積もりを効率化。",
+    "shortDescription": "シンプルで使いやすいスクラムポーカーツール",
+    "roomTitle": "ルーム {code}",
+    "joinTitle": "ルーム {code} に参加"
+  }
+}

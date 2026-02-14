@@ -1,20 +1,22 @@
+'use client'
+
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function NotFound() {
+  const t = useTranslations()
   return (
     <div className="mx-auto max-w-md py-12">
       <Card>
         <CardHeader>
-          <CardTitle>ページが見つかりません</CardTitle>
+          <CardTitle>{t('errors.pageNotFound')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-sm text-muted-foreground">
-            お探しのページは存在しないか、移動した可能性があります。
-          </p>
+          <p className="text-sm text-muted-foreground">{t('errors.pageNotFoundDescription')}</p>
           <Button asChild>
-            <Link href="/">ホームに戻る</Link>
+            <Link href="/">{t('common.homeLink')}</Link>
           </Button>
         </CardContent>
       </Card>

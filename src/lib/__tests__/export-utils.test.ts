@@ -13,15 +13,20 @@ const makeSession = (
   ...overrides,
 })
 
+const defaultTranslations = {
+  header: 'ラウンド,トピック,日時,参加者,投票値',
+  noTopic: '(トピックなし)',
+}
+
 describe('generateCsv', () => {
   it('generates correct header row', () => {
-    const csv = generateCsv([])
+    const csv = generateCsv([], defaultTranslations)
     expect(csv).toBe('ラウンド,トピック,日時,参加者,投票値')
   })
 
   it('generates CSV for a single session', () => {
     const session = makeSession()
-    const csv = generateCsv([session])
+    const csv = generateCsv([session], defaultTranslations)
     const lines = csv.split('\n')
 
     expect(lines).toHaveLength(3)
@@ -36,7 +41,7 @@ describe('generateCsv', () => {
       makeSession({ topic: 'Sprint 2' }),
       makeSession({ topic: 'Sprint 3' }),
     ]
-    const csv = generateCsv(sessions)
+    const csv = generateCsv(sessions, defaultTranslations)
     const lines = csv.split('\n')
 
     expect(lines[1]).toMatch(/^1,/)
@@ -45,14 +50,14 @@ describe('generateCsv', () => {
   })
 
   it('returns only header for empty sessions array', () => {
-    const csv = generateCsv([])
+    const csv = generateCsv([], defaultTranslations)
     expect(csv).toBe('ラウンド,トピック,日時,参加者,投票値')
     expect(csv.split('\n')).toHaveLength(1)
   })
 
-  it('uses (トピックなし) when topic is empty string', () => {
+  it('uses noTopic translation when topic is empty string', () => {
     const session = makeSession({ topic: '' })
-    const csv = generateCsv([session])
+    const csv = generateCsv([session], defaultTranslations)
     const lines = csv.split('\n')
 
     expect(lines[1]).toContain('(トピックなし)')
@@ -62,7 +67,7 @@ describe('generateCsv', () => {
     const session = makeSession({
       votes: [{ participantName: 'Last, First', cardValue: '3' }],
     })
-    const csv = generateCsv([session])
+    const csv = generateCsv([session], defaultTranslations)
     const lines = csv.split('\n')
 
     expect(lines[1]).toContain('"Last, First"')
@@ -72,7 +77,7 @@ describe('generateCsv', () => {
     const session = makeSession({
       topic: 'Feature "Alpha"',
     })
-    const csv = generateCsv([session])
+    const csv = generateCsv([session], defaultTranslations)
     const lines = csv.split('\n')
 
     expect(lines[1]).toContain('"Feature ""Alpha"""')
@@ -82,7 +87,7 @@ describe('generateCsv', () => {
     const session = makeSession({
       votes: [{ participantName: 'Line1\nLine2', cardValue: '5' }],
     })
-    const csv = generateCsv([session])
+    const csv = generateCsv([session], defaultTranslations)
 
     expect(csv).toContain('"Line1\nLine2"')
   })
@@ -92,7 +97,7 @@ describe('generateCsv', () => {
       topic: 'Simple Topic',
       votes: [{ participantName: 'Alice', cardValue: '5' }],
     })
-    const csv = generateCsv([session])
+    const csv = generateCsv([session], defaultTranslations)
     const lines = csv.split('\n')
 
     expect(lines[1]).toBe('1,Simple Topic,2026-02-09T10:00:00Z,Alice,5')
