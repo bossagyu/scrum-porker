@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { Globe } from 'lucide-react'
 import { useLocale } from '@/i18n/client'
 import { Button } from '@/components/ui/button'
 
@@ -17,10 +18,12 @@ export function Header() {
           <span>Scrum Poker</span>
         </Link>
         <Button
-          variant="ghost"
+          variant="outline"
           size="sm"
           onClick={() => setLocale(locale === 'ja' ? 'en' : 'ja')}
+          className="gap-1.5"
         >
+          <Globe className="size-4" />
           {locale === 'ja' ? 'EN' : '日本語'}
         </Button>
       </div>
