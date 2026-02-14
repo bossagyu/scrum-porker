@@ -75,7 +75,8 @@
     "reveal": "結果を公開",
     "nextRound": "次のラウンド",
     "history": "履歴",
-    "invite": "招待"
+    "invite": "招待",
+    "votingProgress": "{voted}/{total} 投票済み"
   },
   "invite": {
     "title": "メンバーを招待",
@@ -140,7 +141,8 @@
     "displayNameRequired": "表示名を入力してください",
     "displayNameMax": "表示名は20文字以内で入力してください",
     "roomCodeRequired": "ルームコードを入力してください",
-    "customCardsInvalid": "カスタムカードは2〜20枚の数値をカンマ区切りで入力してください"
+    "customCardsInvalid": "カスタムカードは2〜20枚の数値をカンマ区切りで入力してください",
+    "customCardsMinimum": "カードは3枚以上必要です"
   },
   "metadata": {
     "description": "シンプルで使いやすいスクラムポーカーツール。リアルタイムでチームのストーリーポイント見積もりを効率化。",

@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState, useEffect } from 'react'
+import { useActionState, useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -18,6 +18,7 @@ const initialState: JoinRoomState = {}
 export function JoinRoomForm({ defaultRoomCode, roomName }: JoinRoomFormProps) {
   const t = useTranslations()
   const [state, formAction, isPending] = useActionState(joinRoom, initialState)
+  const [roomCodeValue, setRoomCodeValue] = useState(defaultRoomCode ?? '')
 
   useEffect(() => {
     if (state.redirectTo) {
@@ -43,7 +44,8 @@ export function JoinRoomForm({ defaultRoomCode, roomName }: JoinRoomFormProps) {
               id="roomCode"
               name="roomCode"
               placeholder="ABC123"
-              defaultValue={defaultRoomCode}
+              value={roomCodeValue}
+              onChange={(e) => setRoomCodeValue(e.target.value.toUpperCase())}
               required
               maxLength={6}
               className="uppercase"

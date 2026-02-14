@@ -19,6 +19,7 @@ export function RoomHeader({ onToggleHistory }: RoomHeaderProps) {
   const roomId = useRoomStore((s) => s.roomId)
   const currentSession = useRoomStore((s) => s.currentSession)
   const participants = useRoomStore((s) => s.participants)
+  const votes = useRoomStore((s) => s.votes)
   const currentParticipantId = useRoomStore((s) => s.currentParticipantId)
   const [isPending, startTransition] = useTransition()
 
@@ -28,6 +29,10 @@ export function RoomHeader({ onToggleHistory }: RoomHeaderProps) {
   )
   const isFacilitator = currentParticipant?.is_facilitator ?? false
   const allowAllControl = useRoomStore((s) => s.allowAllControl)
+
+  const voters = participants.filter((p) => !p.is_observer)
+  const votedCount = votes.length
+  const totalVoters = voters.length
 
   const handleReveal = () => {
     if (!currentSession?.id) return
@@ -55,6 +60,11 @@ export function RoomHeader({ onToggleHistory }: RoomHeaderProps) {
           )}
         </div>
         <CountdownTimer />
+        {currentSession && !isRevealed && totalVoters > 0 && (
+          <span className="text-sm text-muted-foreground">
+            {t('roomHeader.votingProgress', { voted: votedCount, total: totalVoters })}
+          </span>
+        )}
       </div>
       <div className="flex gap-2">
         {isFacilitator && <RoomSettingsDialog />}

@@ -36,7 +36,7 @@ test.describe('Countdown Timer', () => {
     await joinerPage.getByRole('button', { name: '8', exact: true }).click()
 
     // Wait for votes to register
-    await expect(hostPage.getByText('投票済み')).toHaveCount(2, {
+    await expect(hostPage.getByText('投票済み', { exact: true })).toHaveCount(2, {
       timeout: 10_000,
     })
 

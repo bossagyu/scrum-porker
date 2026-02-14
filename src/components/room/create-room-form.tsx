@@ -15,6 +15,24 @@ export function CreateRoomForm() {
   const t = useTranslations()
   const [state, formAction, isPending] = useActionState(createRoom, initialState)
   const [selectedCardSet, setSelectedCardSet] = useState<CardSetType>('fibonacci')
+  const [customCardsValue, setCustomCardsValue] = useState('')
+  const [customCardsError, setCustomCardsError] = useState<string | null>(null)
+
+  const validateCustomCards = (value: string) => {
+    if (!value.trim()) {
+      setCustomCardsError(null)
+      return
+    }
+    const cards = value
+      .split(',')
+      .map((c) => c.trim())
+      .filter((c) => c !== '')
+    if (cards.length < 3) {
+      setCustomCardsError(t('validation.customCardsMinimum'))
+      return
+    }
+    setCustomCardsError(null)
+  }
 
   const cardSetOptions = [
     { value: 'fibonacci' as const, label: t('cardSets.fibonacci') },
@@ -93,12 +111,20 @@ export function CreateRoomForm() {
               ))}
             </div>
             {selectedCardSet === 'custom' && (
-              <div className="mt-2">
+              <div className="mt-2 space-y-1">
                 <Input
                   name="customCards"
                   placeholder="0.5, 1, 2, 3, 5, 8"
                   className="w-full"
+                  value={customCardsValue}
+                  onChange={(e) => {
+                    setCustomCardsValue(e.target.value)
+                    validateCustomCards(e.target.value)
+                  }}
                 />
+                {customCardsError && (
+                  <p className="text-xs text-destructive">{customCardsError}</p>
+                )}
               </div>
             )}
           </div>

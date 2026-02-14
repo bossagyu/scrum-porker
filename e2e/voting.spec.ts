@@ -7,7 +7,7 @@ test.describe('Voting Flow', () => {
 
     await page.getByRole('button', { name: '5', exact: true }).click()
 
-    await expect(page.getByText('投票済み')).toBeVisible()
+    await expect(page.getByText('投票済み', { exact: true })).toBeVisible()
   })
 
   test('should highlight the selected card', async ({ page }) => {
@@ -39,7 +39,7 @@ test.describe('Voting Flow', () => {
     await joinerPage.getByRole('button', { name: '8', exact: true }).click()
 
     // Wait for votes to register
-    await expect(facilitatorPage.getByText('投票済み')).toHaveCount(2, {
+    await expect(facilitatorPage.getByText('投票済み', { exact: true })).toHaveCount(2, {
       timeout: 10_000,
     })
 
@@ -66,7 +66,7 @@ test.describe('Voting Flow', () => {
 
     // Vote on a card
     await page.getByRole('button', { name: '5', exact: true }).click()
-    await expect(page.getByText('投票済み')).toBeVisible()
+    await expect(page.getByText('投票済み', { exact: true })).toBeVisible()
 
     // Reveal
     await page.getByRole('button', { name: '結果を公開' }).click()
