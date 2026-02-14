@@ -7,13 +7,15 @@ export type ExportSession = {
   }[]
 }
 
-export function generateCsv(sessions: readonly ExportSession[]): string {
-  const header = 'ラウンド,トピック,日時,参加者,投票値'
+export function generateCsv(
+  sessions: readonly ExportSession[],
+  translations: { readonly header: string; readonly noTopic: string },
+): string {
   const rows = sessions.flatMap((session, index) =>
     session.votes.map((vote) =>
       [
         index + 1,
-        escapeCsvField(session.topic || '(トピックなし)'),
+        escapeCsvField(session.topic || translations.noTopic),
         session.createdAt,
         escapeCsvField(vote.participantName),
         escapeCsvField(vote.cardValue),
@@ -21,7 +23,7 @@ export function generateCsv(sessions: readonly ExportSession[]): string {
     ),
   )
 
-  return [header, ...rows].join('\n')
+  return [translations.header, ...rows].join('\n')
 }
 
 function escapeCsvField(value: string): string {

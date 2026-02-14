@@ -8,7 +8,7 @@ export async function submitVote(
   cardValue: string,
 ) {
   if (!sessionId || !participantId || !cardValue) {
-    return { error: '無効な入力です' }
+    return { error: 'errors.invalidInput' }
   }
 
   try {
@@ -24,7 +24,7 @@ export async function submitVote(
     )
 
     if (error) {
-      return { error: '投票に失敗しました' }
+      return { error: 'errors.vote' }
     }
 
     await supabase.rpc('auto_reveal_if_complete', {
@@ -33,13 +33,13 @@ export async function submitVote(
 
     return { success: true }
   } catch {
-    return { error: '投票に失敗しました' }
+    return { error: 'errors.vote' }
   }
 }
 
 export async function revealVotes(sessionId: string) {
   if (!sessionId) {
-    return { error: '無効なセッションIDです' }
+    return { error: 'errors.invalidSession' }
   }
 
   try {
@@ -51,18 +51,18 @@ export async function revealVotes(sessionId: string) {
       .eq('id', sessionId)
 
     if (error) {
-      return { error: '結果の公開に失敗しました' }
+      return { error: 'errors.reveal' }
     }
 
     return { success: true }
   } catch {
-    return { error: '結果の公開に失敗しました' }
+    return { error: 'errors.reveal' }
   }
 }
 
 export async function revealOnTimerExpiry(sessionId: string) {
   if (!sessionId) {
-    return { error: '無効なセッションIDです' }
+    return { error: 'errors.invalidSession' }
   }
 
   try {
@@ -73,18 +73,18 @@ export async function revealOnTimerExpiry(sessionId: string) {
     })
 
     if (error) {
-      return { error: 'タイマー公開に失敗しました' }
+      return { error: 'errors.timerReveal' }
     }
 
     return { success: true, revealed: data }
   } catch {
-    return { error: 'タイマー公開に失敗しました' }
+    return { error: 'errors.timerReveal' }
   }
 }
 
 export async function resetVoting(roomId: string) {
   if (!roomId) {
-    return { error: '無効なルームIDです' }
+    return { error: 'errors.invalidRoom' }
   }
 
   try {
@@ -97,11 +97,11 @@ export async function resetVoting(roomId: string) {
       .single()
 
     if (error) {
-      return { error: 'リセットに失敗しました' }
+      return { error: 'errors.reset' }
     }
 
     return { success: true, session }
   } catch {
-    return { error: 'リセットに失敗しました' }
+    return { error: 'errors.reset' }
   }
 }

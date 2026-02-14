@@ -17,7 +17,7 @@ export async function getSessionHistory(roomId: string): Promise<{
   readonly error?: string
 }> {
   if (!roomId) {
-    return { error: '無効なルームIDです' }
+    return { error: 'errors.invalidRoom' }
   }
 
   try {
@@ -31,7 +31,7 @@ export async function getSessionHistory(roomId: string): Promise<{
       .order('created_at', { ascending: false })
 
     if (sessionsError) {
-      return { error: '履歴の取得に失敗しました' }
+      return { error: 'errors.historyFetch' }
     }
 
     if (!sessions || sessions.length === 0) {
@@ -66,7 +66,7 @@ export async function getSessionHistory(roomId: string): Promise<{
         topic: session.topic,
         createdAt: session.created_at,
         votes: sessionVotes.map((v) => ({
-          participantName: participantMap.get(v.participant_id) ?? '不明',
+          participantName: participantMap.get(v.participant_id) ?? 'errors.unknown',
           cardValue: v.card_value,
         })),
       }
@@ -74,6 +74,6 @@ export async function getSessionHistory(roomId: string): Promise<{
 
     return { data: history }
   } catch {
-    return { error: '履歴の取得に失敗しました' }
+    return { error: 'errors.historyFetch' }
   }
 }

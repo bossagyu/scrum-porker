@@ -1,18 +1,18 @@
 export const CARD_SETS = {
   fibonacci: {
-    name: 'フィボナッチ数列',
+    nameKey: 'cardSets.fibonacci',
     cards: ['0', '1', '2', '3', '5', '8', '13', '21', '34', '?', '∞', '☕'],
   },
   tshirt: {
-    name: 'Tシャツサイズ',
+    nameKey: 'cardSets.tshirt',
     cards: ['XS', 'S', 'M', 'L', 'XL', 'XXL', '?', '☕'],
   },
   powerOf2: {
-    name: '2のべき乗',
+    nameKey: 'cardSets.powerOf2',
     cards: ['1', '2', '4', '8', '16', '32', '64', '?', '∞', '☕'],
   },
   custom: {
-    name: 'カスタム',
+    nameKey: 'cardSets.custom',
     cards: [] as string[],
   },
 } as const
@@ -39,9 +39,9 @@ export function getCardsForRoom(
 
 // Timer duration options in seconds (null = no timer)
 export const TIMER_OPTIONS = [
-  { value: null, label: 'なし' },
-  { value: 30, label: '30秒' },
-  { value: 60, label: '1分' },
-  { value: 120, label: '2分' },
-  { value: 300, label: '5分' },
+  { value: null, labelKey: 'timer.none' },
+  { value: 30, labelKey: 'timer.seconds' },
+  { value: 60, labelKey: 'timer.minutes' },
+  { value: 120, labelKey: 'timer.minutes' },
+  { value: 300, labelKey: 'timer.minutes' },
 ] as const

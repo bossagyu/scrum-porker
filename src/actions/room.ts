@@ -5,7 +5,7 @@ import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { generateRoomCode } from '@/lib/room-utils'
 
 const createRoomSchema = z.object({
-  name: z.string().min(1, 'ルーム名を入力してください').max(100, 'ルーム名は100文字以内で入力してください'),
+  name: z.string().min(1, 'validation.roomNameRequired').max(100, 'validation.roomNameMax'),
   cardSet: z.enum(['fibonacci', 'tshirt', 'powerOf2', 'custom']),
   customCards: z
     .string()
@@ -21,8 +21,8 @@ const createRoomSchema = z.object({
     .default(null),
   displayName: z
     .string()
-    .min(1, '表示名を入力してください')
-    .max(20, '表示名は20文字以内で入力してください'),
+    .min(1, 'validation.displayNameRequired')
+    .max(20, 'validation.displayNameMax'),
 }).refine((data) => {
   if (data.cardSet === 'custom') {
     if (!data.customCards || data.customCards.length < 2 || data.customCards.length > 20) {
@@ -32,16 +32,16 @@ const createRoomSchema = z.object({
   }
   return true
 }, {
-  message: 'カスタムカードは2〜20枚の数値をカンマ区切りで入力してください',
+  message: 'validation.customCardsInvalid',
   path: ['customCards'],
 })
 
 const joinRoomSchema = z.object({
-  roomCode: z.string().min(1, 'ルームコードを入力してください'),
+  roomCode: z.string().min(1, 'validation.roomCodeRequired'),
   displayName: z
     .string()
-    .min(1, '表示名を入力してください')
-    .max(20, '表示名は20文字以内で入力してください'),
+    .min(1, 'validation.displayNameRequired')
+    .max(20, 'validation.displayNameMax'),
 })
 
 export type CreateRoomState = {
@@ -67,7 +67,7 @@ export async function createRoom(
 
   if (!userId) {
     const { data: authData, error: authError } = await supabase.auth.signInAnonymously()
-    if (authError) return { error: '認証に失敗しました' }
+    if (authError) return { error: 'errors.auth' }
     userId = authData.user?.id
   }
 
@@ -105,7 +105,7 @@ export async function createRoom(
     .select('*')
     .single()
 
-  if (roomError) return { error: 'ルームの作成に失敗しました' }
+  if (roomError) return { error: 'errors.roomCreate' }
 
   const { error: participantError } = await supabase.from('participants').insert({
     room_id: room.id,
@@ -114,7 +114,7 @@ export async function createRoom(
     is_facilitator: true,
   })
 
-  if (participantError) return { error: '参加者の登録に失敗しました' }
+  if (participantError) return { error: 'errors.participantRegister' }
 
   await supabase.from('voting_sessions').insert({
     room_id: room.id,
@@ -137,7 +137,7 @@ export async function joinRoom(
 
   if (!userId) {
     const { data: authData, error: authError } = await supabase.auth.signInAnonymously()
-    if (authError) return { error: '認証に失敗しました' }
+    if (authError) return { error: 'errors.auth' }
     userId = authData.user?.id
   }
 
@@ -159,7 +159,7 @@ export async function joinRoom(
     .eq('is_active', true)
     .single()
 
-  if (roomError || !room) return { error: 'ルームが見つかりません' }
+  if (roomError || !room) return { error: 'errors.roomNotFoundAction' }
 
   const { data: existing } = await supabase
     .from('participants')
@@ -180,9 +180,9 @@ export async function joinRoom(
 
   if (joinError) {
     if (joinError.code === '23505') {
-      return { error: 'この表示名は既に使われています' }
+      return { error: 'errors.duplicateDisplayName' }
     }
-    return { error: 'ルームへの参加に失敗しました' }
+    return { error: 'errors.joinFailed' }
   }
 
   return { redirectTo: `/room/${roomCode}` }
@@ -219,7 +219,7 @@ const updateRoomSettingsSchema = z.object({
   }
   return true
 }, {
-  message: 'カスタムカードは2〜20枚の数値をカンマ区切りで入力してください',
+  message: 'validation.customCardsInvalid',
   path: ['customCards'],
 })
 
@@ -233,7 +233,7 @@ export async function updateRoomSettings(
 ): Promise<UpdateRoomSettingsState> {
   const parsed = updateRoomSettingsSchema.safeParse(input)
   if (!parsed.success) {
-    return { error: '入力が無効です' }
+    return { error: 'errors.invalidInput' }
   }
 
   try {
@@ -242,7 +242,7 @@ export async function updateRoomSettings(
     const {
       data: { user },
     } = await supabase.auth.getUser()
-    if (!user) return { error: '認証が必要です' }
+    if (!user) return { error: 'errors.authRequired' }
 
     const { data: participant } = await supabase
       .from('participants')
@@ -252,7 +252,7 @@ export async function updateRoomSettings(
       .single()
 
     if (!participant?.is_facilitator) {
-      return { error: '設定を変更する権限がありません' }
+      return { error: 'errors.permissionDenied' }
     }
 
     const { error } = await supabase
@@ -267,12 +267,12 @@ export async function updateRoomSettings(
       .eq('id', parsed.data.roomId)
 
     if (error) {
-      return { error: '設定の更新に失敗しました' }
+      return { error: 'errors.settingsUpdate' }
     }
 
     return { success: true }
   } catch {
-    return { error: '設定の更新に失敗しました' }
+    return { error: 'errors.settingsUpdate' }
   }
 }
 
