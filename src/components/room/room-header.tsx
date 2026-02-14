@@ -6,6 +6,7 @@ import { useRoomStore } from '@/stores/room-store'
 import { revealVotes, resetVoting } from '@/actions/vote'
 import { Button } from '@/components/ui/button'
 import { CountdownTimer } from './countdown-timer'
+import { InviteDialog } from './invite-dialog'
 import { RoomSettingsDialog } from './room-settings-dialog'
 
 type RoomHeaderProps = {
@@ -60,6 +61,7 @@ export function RoomHeader({ onToggleHistory }: RoomHeaderProps) {
         <Button variant="outline" size="sm" onClick={onToggleHistory}>
           {t('roomHeader.history')}
         </Button>
+        {roomCode && <InviteDialog roomCode={roomCode} />}
         {(isFacilitator || allowAllControl) && (
           <>
             {!isRevealed && currentSession && (
