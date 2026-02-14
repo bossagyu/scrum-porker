@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Copy, Check, Share2, UserPlus } from 'lucide-react'
 import QRCode from 'qrcode'
@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -21,7 +22,6 @@ export function InviteDialog({ roomCode }: InviteDialogProps) {
   const t = useTranslations()
   const [copied, setCopied] = useState(false)
   const [supportsShare, setSupportsShare] = useState(false)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
   const [open, setOpen] = useState(false)
 
   const joinUrl =
@@ -33,14 +33,17 @@ export function InviteDialog({ roomCode }: InviteDialogProps) {
     setSupportsShare(typeof navigator.share === 'function')
   }, [])
 
-  useEffect(() => {
-    if (!open || !canvasRef.current || !joinUrl) return
-    QRCode.toCanvas(canvasRef.current, joinUrl, {
-      width: 200,
-      margin: 2,
-      color: { dark: '#000000', light: '#ffffff' },
-    })
-  }, [open, joinUrl])
+  const canvasCallback = useCallback(
+    (canvas: HTMLCanvasElement | null) => {
+      if (!canvas || !joinUrl) return
+      QRCode.toCanvas(canvas, joinUrl, {
+        width: 200,
+        margin: 2,
+        color: { dark: '#000000', light: '#ffffff' },
+      })
+    },
+    [joinUrl],
+  )
 
   const handleCopy = useCallback(async () => {
     await navigator.clipboard.writeText(joinUrl)
@@ -66,6 +69,9 @@ export function InviteDialog({ roomCode }: InviteDialogProps) {
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{t('invite.title')}</DialogTitle>
+          <DialogDescription className="sr-only">
+            {t('invite.roomCode')}: {roomCode}
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-6">
           <div>
@@ -115,7 +121,7 @@ export function InviteDialog({ roomCode }: InviteDialogProps) {
               {t('invite.qrCode')}
             </p>
             <div className="flex justify-center rounded-lg bg-white p-4">
-              <canvas ref={canvasRef} />
+              {open && <canvas ref={canvasCallback} />}
             </div>
           </div>
         </div>
