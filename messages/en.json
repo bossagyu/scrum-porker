@@ -8,6 +8,12 @@
     "saving": "Saving...",
     "settings": "Settings"
   },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "toggle": "Toggle theme"
+  },
   "home": {
     "description": "A simple tool for estimating story points with your team"
   },

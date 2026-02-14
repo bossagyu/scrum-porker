@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Globe } from 'lucide-react'
 import { useLocale } from '@/i18n/client'
 import { Button } from '@/components/ui/button'
+import { ThemeToggle } from '@/components/layout/theme-toggle'
 
 export function Header() {
   const { locale, setLocale } = useLocale()
@@ -17,15 +18,18 @@ export function Header() {
           </span>
           <span>Scrum Poker</span>
         </Link>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setLocale(locale === 'ja' ? 'en' : 'ja')}
-          className="gap-1.5"
-        >
-          <Globe className="size-4" />
-          {locale === 'ja' ? 'EN' : '日本語'}
-        </Button>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setLocale(locale === 'ja' ? 'en' : 'ja')}
+            className="gap-1.5"
+          >
+            <Globe className="size-4" />
+            {locale === 'ja' ? 'EN' : '日本語'}
+          </Button>
+        </div>
       </div>
     </header>
   )

@@ -4,6 +4,7 @@ import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
 import { Header } from '@/components/layout/header'
 import { HtmlLangSync } from '@/components/layout/html-lang-sync'
+import { ThemeProvider } from '@/components/layout/theme-provider'
 import { I18nProvider } from '@/i18n/client'
 import './globals.css'
 
@@ -79,7 +80,7 @@ const jsonLd = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ja" className={`${GeistSans.variable} ${GeistMono.variable}`}>
+    <html lang="ja" className={`${GeistSans.variable} ${GeistMono.variable}`} suppressHydrationWarning>
       <head>
         <script
           type="application/ld+json"
@@ -99,11 +100,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </Script>
       </head>
       <body className="min-h-screen bg-background antialiased">
-        <I18nProvider>
-          <HtmlLangSync />
-          <Header />
-          <main className="container mx-auto px-4 py-8">{children}</main>
-        </I18nProvider>
+        <ThemeProvider>
+          <I18nProvider>
+            <HtmlLangSync />
+            <Header />
+            <main className="container mx-auto px-4 py-8">{children}</main>
+          </I18nProvider>
+        </ThemeProvider>
       </body>
     </html>
   )
