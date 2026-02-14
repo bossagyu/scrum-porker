@@ -74,7 +74,17 @@
   "roomHeader": {
     "reveal": "結果を公開",
     "nextRound": "次のラウンド",
-    "history": "履歴"
+    "history": "履歴",
+    "invite": "招待"
+  },
+  "invite": {
+    "title": "メンバーを招待",
+    "roomCode": "ルームコード",
+    "joinUrl": "参加URL",
+    "copy": "コピー",
+    "copied": "コピーしました",
+    "share": "共有",
+    "qrCode": "QRコード"
   },
   "roomSettings": {
     "title": "ルーム設定"

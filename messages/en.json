@@ -74,7 +74,17 @@
   "roomHeader": {
     "reveal": "Reveal Results",
     "nextRound": "Next Round",
-    "history": "History"
+    "history": "History",
+    "invite": "Invite"
+  },
+  "invite": {
+    "title": "Invite Members",
+    "roomCode": "Room Code",
+    "joinUrl": "Join URL",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "share": "Share",
+    "qrCode": "QR Code"
   },
   "roomSettings": {
     "title": "Room Settings"
