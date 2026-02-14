@@ -43,7 +43,10 @@ export function ParticipantList() {
                   )}
                 </div>
                 {hasSession && !participant.is_observer && (
-                  <Badge variant={hasVoted ? 'default' : 'outline'}>
+                  <Badge
+                    variant={hasVoted ? 'default' : 'outline'}
+                    className={hasVoted ? '' : 'bg-muted'}
+                  >
                     {hasVoted ? t('participant.voted') : t('participant.notVoted')}
                   </Badge>
                 )}

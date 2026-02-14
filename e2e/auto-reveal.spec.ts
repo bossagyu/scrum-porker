@@ -62,7 +62,7 @@ test.describe('Auto Reveal', () => {
 
     // Vote
     await page.getByRole('button', { name: '5', exact: true }).click()
-    await expect(page.getByText('投票済み')).toBeVisible()
+    await expect(page.getByText('投票済み', { exact: true })).toBeVisible()
 
     // Wait and confirm results do NOT appear
     await page.waitForTimeout(5000)

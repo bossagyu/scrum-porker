@@ -75,7 +75,8 @@
     "reveal": "Reveal Results",
     "nextRound": "Next Round",
     "history": "History",
-    "invite": "Invite"
+    "invite": "Invite",
+    "votingProgress": "{voted}/{total} voted"
   },
   "invite": {
     "title": "Invite Members",
@@ -140,7 +141,8 @@
     "displayNameRequired": "Please enter a display name",
     "displayNameMax": "Display name must be 20 characters or less",
     "roomCodeRequired": "Please enter a room code",
-    "customCardsInvalid": "Please enter 2-20 numbers separated by commas for custom cards"
+    "customCardsInvalid": "Please enter 2-20 numbers separated by commas for custom cards",
+    "customCardsMinimum": "At least 3 cards are required"
   },
   "metadata": {
     "description": "A simple and easy-to-use Scrum Poker tool. Streamline your team's story point estimation in real time.",

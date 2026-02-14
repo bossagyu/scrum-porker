@@ -47,7 +47,7 @@ test.describe('Session History', () => {
     await joinerPage.getByRole('button', { name: '8', exact: true }).click()
 
     // Wait for votes to register
-    await expect(facilitatorPage.getByText('投票済み')).toHaveCount(2, {
+    await expect(facilitatorPage.getByText('投票済み', { exact: true })).toHaveCount(2, {
       timeout: 10_000,
     })
 
@@ -80,7 +80,7 @@ test.describe('Session History', () => {
 
     // Vote and reveal to create a completed round
     await page.getByRole('button', { name: '3', exact: true }).click()
-    await expect(page.getByText('投票済み')).toBeVisible()
+    await expect(page.getByText('投票済み', { exact: true })).toBeVisible()
     await page.getByRole('button', { name: '結果を公開' }).click()
     await expect(page.getByText('投票結果')).toBeVisible({ timeout: 10_000 })
 
@@ -100,7 +100,7 @@ test.describe('Session History', () => {
 
     // Round 1: vote and reveal
     await page.getByRole('button', { name: '3', exact: true }).click()
-    await expect(page.getByText('投票済み')).toBeVisible()
+    await expect(page.getByText('投票済み', { exact: true })).toBeVisible()
     await page.getByRole('button', { name: '結果を公開' }).click()
     await expect(page.getByText('投票結果')).toBeVisible({ timeout: 10_000 })
 
@@ -112,7 +112,7 @@ test.describe('Session History', () => {
 
     // Round 2: vote and reveal
     await page.getByRole('button', { name: '8', exact: true }).click()
-    await expect(page.getByText('投票済み')).toBeVisible()
+    await expect(page.getByText('投票済み', { exact: true })).toBeVisible()
     await page.getByRole('button', { name: '結果を公開' }).click()
     await expect(page.getByText('投票結果')).toBeVisible({ timeout: 10_000 })
 
