@@ -1,6 +1,7 @@
 'use client'
 
 import { useActionState, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -15,6 +16,7 @@ type JoinRoomFormProps = {
 const initialState: JoinRoomState = {}
 
 export function JoinRoomForm({ defaultRoomCode, roomName }: JoinRoomFormProps) {
+  const t = useTranslations()
   const [state, formAction, isPending] = useActionState(joinRoom, initialState)
 
   useEffect(() => {
@@ -26,17 +28,17 @@ export function JoinRoomForm({ defaultRoomCode, roomName }: JoinRoomFormProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>ルームに参加</CardTitle>
+        <CardTitle>{t('joinRoom.title')}</CardTitle>
         <CardDescription>
           {roomName
-            ? `「${roomName}」に参加します`
-            : 'ルームコードを入力して参加します'}
+            ? t('joinRoom.descriptionWithName', { roomName })
+            : t('joinRoom.description')}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form action={formAction} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="roomCode">ルームコード</Label>
+            <Label htmlFor="roomCode">{t('joinRoom.roomCode')}</Label>
             <Input
               id="roomCode"
               name="roomCode"
@@ -49,11 +51,11 @@ export function JoinRoomForm({ defaultRoomCode, roomName }: JoinRoomFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="joinDisplayName">表示名</Label>
+            <Label htmlFor="joinDisplayName">{t('joinRoom.displayName')}</Label>
             <Input
               id="joinDisplayName"
               name="displayName"
-              placeholder="あなたの名前"
+              placeholder={t('joinRoom.displayNamePlaceholder')}
               required
               maxLength={20}
             />
@@ -61,12 +63,12 @@ export function JoinRoomForm({ defaultRoomCode, roomName }: JoinRoomFormProps) {
 
           {state.error && (
             <p className="text-sm text-destructive" role="alert">
-              {state.error}
+              {t(state.error)}
             </p>
           )}
 
           <Button type="submit" className="w-full" disabled={isPending}>
-            {isPending ? '参加中...' : 'ルームに参加'}
+            {isPending ? t('joinRoom.submitting') : t('joinRoom.submit')}
           </Button>
         </form>
       </CardContent>

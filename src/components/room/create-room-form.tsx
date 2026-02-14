@@ -1,6 +1,7 @@
 'use client'
 
 import { useActionState, useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -10,16 +11,23 @@ import { createRoom, type CreateRoomState } from '@/actions/room'
 
 const initialState: CreateRoomState = {}
 
-const cardSetOptions: readonly { readonly value: CardSetType; readonly label: string }[] = [
-  { value: 'fibonacci', label: CARD_SETS.fibonacci.name },
-  { value: 'tshirt', label: CARD_SETS.tshirt.name },
-  { value: 'powerOf2', label: CARD_SETS.powerOf2.name },
-  { value: 'custom', label: CARD_SETS.custom.name },
-]
-
 export function CreateRoomForm() {
+  const t = useTranslations()
   const [state, formAction, isPending] = useActionState(createRoom, initialState)
   const [selectedCardSet, setSelectedCardSet] = useState<CardSetType>('fibonacci')
+
+  const cardSetOptions = [
+    { value: 'fibonacci' as const, label: t('cardSets.fibonacci') },
+    { value: 'tshirt' as const, label: t('cardSets.tshirt') },
+    { value: 'powerOf2' as const, label: t('cardSets.powerOf2') },
+    { value: 'custom' as const, label: t('cardSets.custom') },
+  ]
+
+  function getTimerLabel(option: (typeof TIMER_OPTIONS)[number]): string {
+    if (option.value === null) return t('timer.none')
+    if (option.value < 60) return t('timer.seconds', { value: option.value })
+    return t('timer.minutes', { value: option.value / 60 })
+  }
 
   useEffect(() => {
     if (state.redirectTo) {
@@ -30,35 +38,35 @@ export function CreateRoomForm() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>ルームを作成</CardTitle>
-        <CardDescription>新しいスクラムポーカールームを作成します</CardDescription>
+        <CardTitle>{t('createRoom.title')}</CardTitle>
+        <CardDescription>{t('createRoom.description')}</CardDescription>
       </CardHeader>
       <CardContent>
         <form action={formAction} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">ルーム名</Label>
+            <Label htmlFor="name">{t('createRoom.roomName')}</Label>
             <Input
               id="name"
               name="name"
-              placeholder="スプリント計画"
+              placeholder={t('createRoom.roomNamePlaceholder')}
               required
               maxLength={100}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="displayName">表示名</Label>
+            <Label htmlFor="displayName">{t('createRoom.displayName')}</Label>
             <Input
               id="displayName"
               name="displayName"
-              placeholder="あなたの名前"
+              placeholder={t('createRoom.displayNamePlaceholder')}
               required
               maxLength={20}
             />
           </div>
 
           <div className="space-y-2">
-            <Label>カードセット</Label>
+            <Label>{t('createRoom.cardSet')}</Label>
             <div className="grid gap-2">
               {cardSetOptions.map((option) => (
                 <label
@@ -77,7 +85,7 @@ export function CreateRoomForm() {
                     <div className="text-sm font-medium">{option.label}</div>
                     <div className="text-xs text-muted-foreground">
                       {option.value === 'custom'
-                        ? '数値をカンマ区切りで入力'
+                        ? t('createRoom.customCardHint')
                         : CARD_SETS[option.value].cards.join(', ')}
                     </div>
                   </div>
@@ -96,11 +104,11 @@ export function CreateRoomForm() {
           </div>
 
           <div className="space-y-2">
-            <Label>タイマー</Label>
+            <Label>{t('createRoom.timer')}</Label>
             <div className="flex flex-wrap gap-2">
               {TIMER_OPTIONS.map((option) => (
                 <label
-                  key={option.label}
+                  key={option.labelKey}
                   className="flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2 hover:bg-accent"
                 >
                   <input
@@ -110,7 +118,7 @@ export function CreateRoomForm() {
                     defaultChecked={option.value === null}
                     className="accent-primary"
                   />
-                  <span className="text-sm">{option.label}</span>
+                  <span className="text-sm">{getTimerLabel(option)}</span>
                 </label>
               ))}
             </div>
@@ -124,7 +132,7 @@ export function CreateRoomForm() {
               value="true"
               className="accent-primary"
             />
-            <Label htmlFor="autoReveal">全員投票後に自動で結果を表示</Label>
+            <Label htmlFor="autoReveal">{t('createRoom.autoReveal')}</Label>
           </div>
 
           <div className="flex items-center gap-2">
@@ -135,17 +143,17 @@ export function CreateRoomForm() {
               value="true"
               className="accent-primary"
             />
-            <Label htmlFor="allowAllControl">全員が結果の公開・次のラウンドを操作可能</Label>
+            <Label htmlFor="allowAllControl">{t('createRoom.allowAllControl')}</Label>
           </div>
 
           {state.error && (
             <p className="text-sm text-destructive" role="alert">
-              {state.error}
+              {t(state.error)}
             </p>
           )}
 
           <Button type="submit" className="w-full" disabled={isPending}>
-            {isPending ? '作成中...' : 'ルームを作成'}
+            {isPending ? t('createRoom.submitting') : t('createRoom.submit')}
           </Button>
         </form>
       </CardContent>

@@ -1,11 +1,13 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { useRoomStore } from '@/stores/room-store'
 import { revealOnTimerExpiry } from '@/actions/vote'
 import { cn } from '@/lib/utils'
 
 export function CountdownTimer() {
+  const t = useTranslations()
   const timerDuration = useRoomStore((s) => s.timerDuration)
   const currentSession = useRoomStore((s) => s.currentSession)
   const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null)
@@ -62,7 +64,7 @@ export function CountdownTimer() {
         isUrgent ? 'bg-destructive/10 text-destructive' : 'bg-muted text-foreground'
       }`}
       role="timer"
-      aria-label={`残り時間 ${display}`}
+      aria-label={t('timer.remaining', { time: display })}
       style={isUrgent ? { animation: 'pulse-urgent 1s ease-in-out infinite' } : undefined}
     >
       <span

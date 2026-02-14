@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { useRoomStore } from '@/stores/room-store'
 import { getSessionHistory, type SessionHistoryEntry } from '@/actions/history'
 import { generateCsv, generateJson, downloadFile, type ExportSession } from '@/lib/export-utils'
@@ -28,6 +29,7 @@ type SessionHistoryProps = {
 }
 
 export function SessionHistory({ onClose }: SessionHistoryProps) {
+  const t = useTranslations()
   const roomId = useRoomStore((s) => s.roomId)
   const [history, setHistory] = useState<readonly SessionHistoryEntry[]>([])
   const [loading, setLoading] = useState(true)
@@ -56,7 +58,10 @@ export function SessionHistory({ onClose }: SessionHistoryProps) {
       createdAt: h.createdAt,
       votes: h.votes,
     }))
-    const csv = generateCsv(sessions)
+    const csv = generateCsv(sessions, {
+      header: t('export.csvHeader'),
+      noTopic: t('export.noTopic'),
+    })
     downloadFile(csv, 'scrum-poker-history.csv', 'text/csv;charset=utf-8')
   }
 
@@ -73,7 +78,7 @@ export function SessionHistory({ onClose }: SessionHistoryProps) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>セッション履歴</CardTitle>
+        <CardTitle>{t('history.title')}</CardTitle>
         <div className="flex gap-2">
           {history.length > 0 && (
             <>
@@ -86,7 +91,7 @@ export function SessionHistory({ onClose }: SessionHistoryProps) {
             </>
           )}
           <Button variant="ghost" size="sm" onClick={onClose}>
-            閉じる
+            {t('common.close')}
           </Button>
         </div>
       </CardHeader>
@@ -110,7 +115,7 @@ export function SessionHistory({ onClose }: SessionHistoryProps) {
         )}
         {error && <p className="text-destructive text-sm">{error}</p>}
         {!loading && !error && history.length === 0 && (
-          <p className="text-muted-foreground text-sm">まだ公開済みのラウンドはありません</p>
+          <p className="text-muted-foreground text-sm">{t('history.empty')}</p>
         )}
         {!loading && !error && history.length > 0 && (
           <div className="space-y-4">
@@ -118,11 +123,11 @@ export function SessionHistory({ onClose }: SessionHistoryProps) {
               <div key={session.id} className="rounded-md border p-3">
                 <div className="mb-2 flex items-center justify-between">
                   <span className="text-sm font-medium">
-                    ラウンド {history.length - index}
+                    {t('history.round', { number: history.length - index })}
                     {session.topic ? `: ${session.topic}` : ''}
                   </span>
                   <span className="text-muted-foreground text-xs">
-                    平均: {calculateSessionAverage(session.votes)}
+                    {t('history.average', { value: calculateSessionAverage(session.votes) })}
                   </span>
                 </div>
                 <div className="flex flex-wrap gap-2">

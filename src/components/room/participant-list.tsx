@@ -1,10 +1,12 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useRoomStore } from '@/stores/room-store'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 
 export function ParticipantList() {
+  const t = useTranslations()
   const participants = useRoomStore((s) => s.participants)
   const votes = useRoomStore((s) => s.votes)
   const currentSession = useRoomStore((s) => s.currentSession)
@@ -16,7 +18,7 @@ export function ParticipantList() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>参加者 ({participants.length})</CardTitle>
+        <CardTitle>{t('participant.title', { count: participants.length })}</CardTitle>
       </CardHeader>
       <CardContent>
         <ul className="space-y-2">
@@ -34,15 +36,15 @@ export function ParticipantList() {
                     {participant.display_name}
                   </span>
                   {participant.is_facilitator && (
-                    <Badge variant="secondary">ファシリテーター</Badge>
+                    <Badge variant="secondary">{t('participant.facilitator')}</Badge>
                   )}
                   {participant.is_observer && (
-                    <Badge variant="outline">オブザーバー</Badge>
+                    <Badge variant="outline">{t('participant.observer')}</Badge>
                   )}
                 </div>
                 {hasSession && !participant.is_observer && (
                   <Badge variant={hasVoted ? 'default' : 'outline'}>
-                    {hasVoted ? '投票済み' : '未投票'}
+                    {hasVoted ? t('participant.voted') : t('participant.notVoted')}
                   </Badge>
                 )}
               </li>
