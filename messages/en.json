@@ -1,0 +1,135 @@
+{
+  "common": {
+    "appName": "Scrum Poker",
+    "homeLink": "Back to Home",
+    "retry": "Retry",
+    "close": "Close",
+    "save": "Save",
+    "saving": "Saving...",
+    "settings": "Settings"
+  },
+  "home": {
+    "description": "A simple tool for estimating story points with your team"
+  },
+  "createRoom": {
+    "title": "Create Room",
+    "description": "Create a new Scrum Poker room",
+    "roomName": "Room Name",
+    "roomNamePlaceholder": "Sprint Planning",
+    "displayName": "Display Name",
+    "displayNamePlaceholder": "Your Name",
+    "cardSet": "Card Set",
+    "customCardHint": "Enter numbers separated by commas",
+    "timer": "Timer",
+    "autoReveal": "Auto-reveal results when all members have voted",
+    "allowAllControl": "Allow all members to reveal results and start next round",
+    "submit": "Create Room",
+    "submitting": "Creating..."
+  },
+  "joinRoom": {
+    "title": "Join Room",
+    "description": "Enter a room code to join",
+    "descriptionWithName": "Join \"{roomName}\"",
+    "roomCode": "Room Code",
+    "displayName": "Display Name",
+    "displayNamePlaceholder": "Your Name",
+    "submit": "Join Room",
+    "submitting": "Joining...",
+    "cardSet": "Card Set: {name}"
+  },
+  "voting": {
+    "selectCard": "Select a Card",
+    "observerCannotVote": "Observers cannot vote",
+    "noSession": "No voting session has started yet",
+    "result": "Voting Results"
+  },
+  "cardSets": {
+    "fibonacci": "Fibonacci Sequence",
+    "tshirt": "T-Shirt Sizes",
+    "powerOf2": "Power of 2",
+    "custom": "Custom",
+    "customCardLabel": "Custom Cards (comma-separated)",
+    "customCardPlaceholder": "e.g. 1, 2, 3, 5, 8, 13",
+    "specialCardsNote": "Special cards (?, ∞, ☕) are added automatically"
+  },
+  "timer": {
+    "none": "None",
+    "seconds": "{value}s",
+    "minutes": "{value}m",
+    "remaining": "Time remaining: {time}"
+  },
+  "participant": {
+    "title": "Participants ({count})",
+    "facilitator": "Facilitator",
+    "observer": "Observer",
+    "voted": "Voted",
+    "notVoted": "Not Voted"
+  },
+  "roomHeader": {
+    "reveal": "Reveal Results",
+    "nextRound": "Next Round",
+    "history": "History"
+  },
+  "roomSettings": {
+    "title": "Room Settings"
+  },
+  "history": {
+    "title": "Session History",
+    "empty": "No revealed rounds yet",
+    "round": "Round {number}",
+    "average": "Average: {value}"
+  },
+  "statistics": {
+    "title": "Statistics",
+    "average": "Average",
+    "median": "Median",
+    "mode": "Mode",
+    "distribution": "Distribution"
+  },
+  "export": {
+    "csvHeader": "Round,Topic,Date,Participant,Vote",
+    "noTopic": "(No Topic)"
+  },
+  "errors": {
+    "roomLoadFailed": "Failed to load room",
+    "roomLoadDescription": "An error occurred while loading room data. The room may not exist or there may be a connection issue.",
+    "roomNotFound": "Room not found",
+    "roomNotFoundDescription": "The specified room does not exist or has already ended. Please check the room code.",
+    "pageNotFound": "Page not found",
+    "pageNotFoundDescription": "The page you are looking for does not exist or may have been moved.",
+    "unexpected": "An error occurred",
+    "unexpectedDescription": "An unexpected error occurred. Please try again.",
+    "auth": "Authentication failed",
+    "roomCreate": "Failed to create room",
+    "participantRegister": "Failed to register participant",
+    "roomNotFoundAction": "Room not found",
+    "joinFailed": "Failed to join room",
+    "duplicateDisplayName": "This display name is already in use",
+    "invalidInput": "Invalid input",
+    "authRequired": "Authentication required",
+    "permissionDenied": "You do not have permission to change settings",
+    "settingsUpdate": "Failed to update settings",
+    "vote": "Failed to vote",
+    "reveal": "Failed to reveal results",
+    "timerReveal": "Timer reveal failed",
+    "reset": "Failed to reset",
+    "historyFetch": "Failed to fetch history",
+    "invalidSession": "Invalid session ID",
+    "invalidRoom": "Invalid room ID",
+    "unknown": "Unknown"
+  },
+  "validation": {
+    "roomNameRequired": "Please enter a room name",
+    "roomNameMax": "Room name must be 100 characters or less",
+    "displayNameRequired": "Please enter a display name",
+    "displayNameMax": "Display name must be 20 characters or less",
+    "roomCodeRequired": "Please enter a room code",
+    "customCardsInvalid": "Please enter 2-20 numbers separated by commas for custom cards"
+  },
+  "metadata": {
+    "description": "A simple and easy-to-use Scrum Poker tool. Streamline your team's story point estimation in real time.",
+    "shortDescription": "A simple and easy-to-use Scrum Poker tool",
+    "roomTitle": "Room {code}",
+    "joinTitle": "Join Room {code}"
+  }
+}
