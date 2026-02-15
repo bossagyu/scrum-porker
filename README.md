@@ -6,7 +6,7 @@
 チームでストーリーポイントを見積もるためのリアルタイム スクラムポーカーアプリ。
 アカウント登録不要 — URLを共有するだけで、すぐにプランニングポーカーを始められます。
 
-👉 **https://scrum-porker-gamma.vercel.app**
+**Demo:** https://scrum-porker-gamma.vercel.app
 
 <!-- TODO: スクリーンショットを docs/images/ に配置して以下を有効化
 <p align="center">
@@ -105,7 +105,7 @@ src/
 │   ├── page.tsx        # トップページ (ルーム作成 & 参加フォーム)
 │   └── room/[code]/    # ルームページ (投票画面)
 ├── components/
-│   ├── layout/         # ヘッダー, テーマ切替, 言語切替
+│   ├── layout/         # ヘッダー (言語切替含む), テーマ切替
 │   ├── room/           # ルーム関連コンポーネント
 │   └── ui/             # shadcn/ui コンポーネント
 ├── lib/
