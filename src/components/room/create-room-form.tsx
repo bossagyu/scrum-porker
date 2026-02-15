@@ -134,7 +134,7 @@ export function CreateRoomForm() {
             <div className="flex flex-wrap gap-2">
               {TIMER_OPTIONS.map((option) => (
                 <label
-                  key={option.labelKey}
+                  key={String(option.value)}
                   className="flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2 hover:bg-accent"
                 >
                   <input
