@@ -66,7 +66,7 @@ export function InviteDialog({ roomCode }: InviteDialogProps) {
           {t('roomHeader.invite')}
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-sm">
+      <DialogContent className="sm:max-w-sm">
         <DialogHeader>
           <DialogTitle>{t('invite.title')}</DialogTitle>
           <DialogDescription className="sr-only">
