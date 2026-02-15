@@ -66,14 +66,14 @@ export function InviteDialog({ roomCode }: InviteDialogProps) {
           {t('roomHeader.invite')}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-sm">
-        <DialogHeader>
+      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-sm">
+        <DialogHeader className="min-w-0">
           <DialogTitle>{t('invite.title')}</DialogTitle>
           <DialogDescription className="sr-only">
             {t('invite.roomCode')}: {roomCode}
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-3">
+        <div className="min-w-0 space-y-3">
           <div>
             <p className="text-sm font-medium text-muted-foreground">
               {t('invite.roomCode')}
