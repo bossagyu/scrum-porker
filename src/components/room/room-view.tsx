@@ -70,7 +70,7 @@ export function RoomView({
   ])
 
   return (
-    <div className="space-y-6">
+    <div className="mx-auto max-w-6xl space-y-6">
       <RoomHeader onToggleHistory={() => setShowHistory((prev) => !prev)} />
       {showHistory && <SessionHistory onClose={() => setShowHistory(false)} />}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-[1fr_280px] lg:grid-cols-[1fr_300px]">
