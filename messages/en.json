@@ -21,7 +21,7 @@
     "title": "Create Room",
     "description": "Create a new Scrum Poker room",
     "roomName": "Room Name",
-    "roomNamePlaceholder": "Sprint Planning",
+    "roomNamePlaceholder": "Room code will be used if left empty",
     "displayName": "Display Name",
     "displayNamePlaceholder": "Your Name",
     "cardSet": "Card Set",

@@ -5,7 +5,7 @@ import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { generateRoomCode } from '@/lib/room-utils'
 
 const createRoomSchema = z.object({
-  name: z.string().min(1, 'validation.roomNameRequired').max(100, 'validation.roomNameMax'),
+  name: z.string().max(100, 'validation.roomNameMax').default(''),
   cardSet: z.enum(['fibonacci', 'tshirt', 'powerOf2', 'custom']),
   customCards: z
     .string()

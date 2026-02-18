@@ -21,7 +21,7 @@
     "title": "ルームを作成",
     "description": "新しいスクラムポーカールームを作成します",
     "roomName": "ルーム名",
-    "roomNamePlaceholder": "スプリント計画",
+    "roomNamePlaceholder": "未入力の場合はルームコードが使用されます",
     "displayName": "表示名",
     "displayNamePlaceholder": "あなたの名前",
     "cardSet": "カードセット",
