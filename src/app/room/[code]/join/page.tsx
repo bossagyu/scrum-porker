@@ -27,11 +27,11 @@ export default async function JoinPage({ params }: JoinPageProps) {
   return (
     <div className="mx-auto max-w-md space-y-6">
       <section className="space-y-2 text-center">
-        <h1 className="text-2xl font-bold">{room.name}</h1>
+        <h1 className="text-2xl font-bold">{room.name || code.toUpperCase()}</h1>
         <CardSetLabel cardSet={room.card_set} />
       </section>
 
-      <JoinRoomForm defaultRoomCode={code.toUpperCase()} roomName={room.name} />
+      <JoinRoomForm defaultRoomCode={code.toUpperCase()} roomName={room.name || undefined} />
     </div>
   )
 }
