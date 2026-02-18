@@ -14,8 +14,8 @@ const createRoomSchema = z.object({
       if (!val) return undefined
       return val.split(',').map((v) => v.trim()).filter(Boolean)
     }),
-  autoReveal: z.boolean().default(false),
-  allowAllControl: z.boolean().default(false),
+  autoReveal: z.boolean().default(true),
+  allowAllControl: z.boolean().default(true),
   timerDuration: z
     .union([z.literal(30), z.literal(60), z.literal(120), z.literal(300), z.null()])
     .default(null),
