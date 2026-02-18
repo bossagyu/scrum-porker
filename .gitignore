@@ -48,3 +48,9 @@ supabase/.temp/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+.playwright-mcp/
+
+# screenshots (temporary debug images)
+/*.png
+/*.jpg
+/*.jpeg
