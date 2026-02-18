@@ -67,7 +67,6 @@ export function CreateRoomForm() {
               id="name"
               name="name"
               placeholder={t('createRoom.roomNamePlaceholder')}
-              required
               maxLength={100}
             />
           </div>
