@@ -15,6 +15,20 @@ export function VoteResult() {
 
   const activeVoters = participants.filter((p) => !p.is_observer)
 
+  const sortedVoters = [...activeVoters].sort((a, b) => {
+    const aValue = votesByParticipant.get(a.id)
+    const bValue = votesByParticipant.get(b.id)
+    const aNum = aValue !== undefined ? Number(aValue) : NaN
+    const bNum = bValue !== undefined ? Number(bValue) : NaN
+    const aIsNumeric = !isNaN(aNum)
+    const bIsNumeric = !isNaN(bNum)
+
+    if (aIsNumeric && bIsNumeric) return bNum - aNum
+    if (aIsNumeric) return -1
+    if (bIsNumeric) return 1
+    return 0
+  })
+
   return (
     <Card>
       <CardHeader>
@@ -22,7 +36,7 @@ export function VoteResult() {
       </CardHeader>
       <CardContent>
         <ul className="space-y-2">
-          {activeVoters.map((participant, index) => {
+          {sortedVoters.map((participant, index) => {
             const cardValue = votesByParticipant.get(participant.id)
 
             return (
