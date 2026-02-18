@@ -9,7 +9,7 @@ describe('CARD_SETS', () => {
 
     it('has the correct cards', () => {
       expect(CARD_SETS.fibonacci.cards).toEqual([
-        '0', '1', '2', '3', '5', '8', '13', '21', '34', '?', '∞', '☕',
+        '0', '0.5', '1', '2', '3', '5', '8', '13', '21', '34', '?', '∞', '☕',
       ])
     })
   })
