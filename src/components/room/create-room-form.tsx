@@ -156,6 +156,7 @@ export function CreateRoomForm() {
               id="autoReveal"
               name="autoReveal"
               value="true"
+              defaultChecked
               className="accent-primary"
             />
             <Label htmlFor="autoReveal">{t('createRoom.autoReveal')}</Label>
@@ -167,6 +168,7 @@ export function CreateRoomForm() {
               id="allowAllControl"
               name="allowAllControl"
               value="true"
+              defaultChecked
               className="accent-primary"
             />
             <Label htmlFor="allowAllControl">{t('createRoom.allowAllControl')}</Label>

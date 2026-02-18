@@ -19,8 +19,8 @@ export async function createRoom(
     await page.locator(`input[name="timerDuration"][value="${options.timerDuration}"]`).check()
   }
 
-  if (options?.autoReveal) {
-    await page.locator('#autoReveal').check()
+  if (options?.autoReveal === false) {
+    await page.locator('#autoReveal').uncheck()
   }
 
   await page.getByRole('button', { name: 'ルームを作成' }).click()

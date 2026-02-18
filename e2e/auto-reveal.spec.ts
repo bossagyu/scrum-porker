@@ -58,7 +58,9 @@ test.describe('Auto Reveal', () => {
   test('should NOT auto-reveal when auto-reveal is disabled', async ({
     page,
   }) => {
-    await createRoom(page, 'No Auto Reveal', 'Facilitator')
+    await createRoom(page, 'No Auto Reveal', 'Facilitator', {
+      autoReveal: false,
+    })
 
     // Vote
     await page.getByRole('button', { name: '5', exact: true }).click()
