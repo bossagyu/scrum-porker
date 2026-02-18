@@ -4,6 +4,12 @@ import Link from 'next/link'
 import { Globe } from 'lucide-react'
 import { useLocale } from '@/i18n/client'
 import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { ThemeToggle } from '@/components/layout/theme-toggle'
 
 export function Header() {
@@ -20,15 +26,24 @@ export function Header() {
         </Link>
         <div className="flex items-center gap-2">
           <ThemeToggle />
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setLocale(locale === 'ja' ? 'en' : 'ja')}
-            className="gap-1.5"
-          >
-            <Globe className="size-4" />
-            {locale === 'ja' ? 'EN' : '日本語'}
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="gap-1.5">
+                <Globe className="size-4" />
+                Language
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setLocale('ja')}>
+                日本語
+                {locale === 'ja' && <span className="ml-auto">✓</span>}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setLocale('en')}>
+                English
+                {locale === 'en' && <span className="ml-auto">✓</span>}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </header>
