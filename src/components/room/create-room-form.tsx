@@ -19,13 +19,15 @@ export function CreateRoomForm() {
   const [customCardsError, setCustomCardsError] = useState<string | null>(null)
 
   const [savedDisplayName, setSavedDisplayName] = useState('')
-
-  const formRef = useRef<HTMLFormElement>(null)
+  const displayNameRef = useRef('')
 
   useEffect(() => {
     try {
       const saved = localStorage.getItem(DISPLAY_NAME_STORAGE_KEY)
-      if (saved) setSavedDisplayName(saved)
+      if (saved) {
+        setSavedDisplayName(saved)
+        displayNameRef.current = saved
+      }
     } catch {
       // localStorage unavailable (private browsing, iframe, etc.)
     }
@@ -62,14 +64,11 @@ export function CreateRoomForm() {
 
   useEffect(() => {
     if (state.redirectTo) {
-      if (formRef.current) {
-        const displayName = new FormData(formRef.current).get('displayName') as string
-        if (displayName) {
-          try {
-            localStorage.setItem(DISPLAY_NAME_STORAGE_KEY, displayName)
-          } catch {
-            // localStorage unavailable
-          }
+      if (displayNameRef.current) {
+        try {
+          localStorage.setItem(DISPLAY_NAME_STORAGE_KEY, displayNameRef.current)
+        } catch {
+          // localStorage unavailable
         }
       }
       window.location.href = state.redirectTo
@@ -83,7 +82,7 @@ export function CreateRoomForm() {
         <CardDescription>{t('createRoom.description')}</CardDescription>
       </CardHeader>
       <CardContent>
-        <form ref={formRef} id="create-room-form" action={formAction} className="space-y-4">
+        <form action={formAction} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">{t('createRoom.roomName')}</Label>
             <Input
@@ -104,6 +103,9 @@ export function CreateRoomForm() {
               maxLength={20}
               defaultValue={savedDisplayName}
               key={savedDisplayName}
+              onChange={(e) => {
+                displayNameRef.current = e.target.value
+              }}
             />
           </div>
 
