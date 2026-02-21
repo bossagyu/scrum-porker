@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { joinRoom, type JoinRoomState } from '@/actions/room'
+import { DISPLAY_NAME_STORAGE_KEY } from '@/lib/constants'
 
 type JoinRoomFormProps = {
   readonly defaultRoomCode?: string
@@ -19,9 +20,22 @@ export function JoinRoomForm({ defaultRoomCode, roomName }: JoinRoomFormProps) {
   const t = useTranslations()
   const [state, formAction, isPending] = useActionState(joinRoom, initialState)
   const [roomCodeValue, setRoomCodeValue] = useState(defaultRoomCode ?? '')
+  const [savedDisplayName, setSavedDisplayName] = useState('')
+
+  useEffect(() => {
+    const saved = localStorage.getItem(DISPLAY_NAME_STORAGE_KEY)
+    if (saved) setSavedDisplayName(saved)
+  }, [])
 
   useEffect(() => {
     if (state.redirectTo) {
+      const form = document.querySelector<HTMLFormElement>('#join-room-form')
+      if (form) {
+        const displayName = new FormData(form).get('displayName') as string
+        if (displayName) {
+          localStorage.setItem(DISPLAY_NAME_STORAGE_KEY, displayName)
+        }
+      }
       window.location.href = state.redirectTo
     }
   }, [state.redirectTo])
@@ -37,7 +51,7 @@ export function JoinRoomForm({ defaultRoomCode, roomName }: JoinRoomFormProps) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form action={formAction} className="space-y-4">
+        <form id="join-room-form" action={formAction} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="roomCode">{t('joinRoom.roomCode')}</Label>
             <Input
@@ -60,6 +74,8 @@ export function JoinRoomForm({ defaultRoomCode, roomName }: JoinRoomFormProps) {
               placeholder={t('joinRoom.displayNamePlaceholder')}
               required
               maxLength={20}
+              defaultValue={savedDisplayName}
+              key={savedDisplayName}
             />
           </div>
 
