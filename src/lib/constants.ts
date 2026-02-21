@@ -45,3 +45,6 @@ export const TIMER_OPTIONS = [
   { value: 120, labelKey: 'timer.minutes' },
   { value: 300, labelKey: 'timer.minutes' },
 ] as const
+
+// localStorage key for remembering display name
+export const DISPLAY_NAME_STORAGE_KEY = 'scrum-poker-display-name'
