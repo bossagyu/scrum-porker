@@ -1,12 +1,13 @@
 'use client'
 
-import { useActionState, useEffect, useState } from 'react'
+import { useActionState, useEffect, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { joinRoom, type JoinRoomState } from '@/actions/room'
+import { DISPLAY_NAME_STORAGE_KEY } from '@/lib/constants'
 
 type JoinRoomFormProps = {
   readonly defaultRoomCode?: string
@@ -19,9 +20,30 @@ export function JoinRoomForm({ defaultRoomCode, roomName }: JoinRoomFormProps) {
   const t = useTranslations()
   const [state, formAction, isPending] = useActionState(joinRoom, initialState)
   const [roomCodeValue, setRoomCodeValue] = useState(defaultRoomCode ?? '')
+  const [savedDisplayName, setSavedDisplayName] = useState('')
+  const formRef = useRef<HTMLFormElement>(null)
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(DISPLAY_NAME_STORAGE_KEY)
+      if (saved) setSavedDisplayName(saved)
+    } catch {
+      // localStorage unavailable (private browsing, iframe, etc.)
+    }
+  }, [])
 
   useEffect(() => {
     if (state.redirectTo) {
+      if (formRef.current) {
+        const displayName = new FormData(formRef.current).get('displayName') as string
+        if (displayName) {
+          try {
+            localStorage.setItem(DISPLAY_NAME_STORAGE_KEY, displayName)
+          } catch {
+            // localStorage unavailable
+          }
+        }
+      }
       window.location.href = state.redirectTo
     }
   }, [state.redirectTo])
@@ -37,7 +59,7 @@ export function JoinRoomForm({ defaultRoomCode, roomName }: JoinRoomFormProps) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form action={formAction} className="space-y-4">
+        <form ref={formRef} id="join-room-form" action={formAction} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="roomCode">{t('joinRoom.roomCode')}</Label>
             <Input
@@ -60,6 +82,8 @@ export function JoinRoomForm({ defaultRoomCode, roomName }: JoinRoomFormProps) {
               placeholder={t('joinRoom.displayNamePlaceholder')}
               required
               maxLength={20}
+              defaultValue={savedDisplayName}
+              key={savedDisplayName}
             />
           </div>
 
