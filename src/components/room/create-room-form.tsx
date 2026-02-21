@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState, useEffect, useState } from 'react'
+import { useActionState, useEffect, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -20,9 +20,15 @@ export function CreateRoomForm() {
 
   const [savedDisplayName, setSavedDisplayName] = useState('')
 
+  const formRef = useRef<HTMLFormElement>(null)
+
   useEffect(() => {
-    const saved = localStorage.getItem(DISPLAY_NAME_STORAGE_KEY)
-    if (saved) setSavedDisplayName(saved)
+    try {
+      const saved = localStorage.getItem(DISPLAY_NAME_STORAGE_KEY)
+      if (saved) setSavedDisplayName(saved)
+    } catch {
+      // localStorage unavailable (private browsing, iframe, etc.)
+    }
   }, [])
 
   const validateCustomCards = (value: string) => {
@@ -56,11 +62,14 @@ export function CreateRoomForm() {
 
   useEffect(() => {
     if (state.redirectTo) {
-      const form = document.querySelector<HTMLFormElement>('#create-room-form')
-      if (form) {
-        const displayName = new FormData(form).get('displayName') as string
+      if (formRef.current) {
+        const displayName = new FormData(formRef.current).get('displayName') as string
         if (displayName) {
-          localStorage.setItem(DISPLAY_NAME_STORAGE_KEY, displayName)
+          try {
+            localStorage.setItem(DISPLAY_NAME_STORAGE_KEY, displayName)
+          } catch {
+            // localStorage unavailable
+          }
         }
       }
       window.location.href = state.redirectTo
@@ -74,7 +83,7 @@ export function CreateRoomForm() {
         <CardDescription>{t('createRoom.description')}</CardDescription>
       </CardHeader>
       <CardContent>
-        <form id="create-room-form" action={formAction} className="space-y-4">
+        <form ref={formRef} id="create-room-form" action={formAction} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">{t('createRoom.roomName')}</Label>
             <Input
