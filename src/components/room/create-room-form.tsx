@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { CARD_SETS, type CardSetType, TIMER_OPTIONS } from '@/lib/constants'
+import { CARD_SETS, type CardSetType, DISPLAY_NAME_STORAGE_KEY, TIMER_OPTIONS } from '@/lib/constants'
 import { createRoom, type CreateRoomState } from '@/actions/room'
 
 const initialState: CreateRoomState = {}
@@ -17,6 +17,13 @@ export function CreateRoomForm() {
   const [selectedCardSet, setSelectedCardSet] = useState<CardSetType>('fibonacci')
   const [customCardsValue, setCustomCardsValue] = useState('')
   const [customCardsError, setCustomCardsError] = useState<string | null>(null)
+
+  const [savedDisplayName, setSavedDisplayName] = useState('')
+
+  useEffect(() => {
+    const saved = localStorage.getItem(DISPLAY_NAME_STORAGE_KEY)
+    if (saved) setSavedDisplayName(saved)
+  }, [])
 
   const validateCustomCards = (value: string) => {
     if (!value.trim()) {
@@ -49,6 +56,13 @@ export function CreateRoomForm() {
 
   useEffect(() => {
     if (state.redirectTo) {
+      const form = document.querySelector<HTMLFormElement>('#create-room-form')
+      if (form) {
+        const displayName = new FormData(form).get('displayName') as string
+        if (displayName) {
+          localStorage.setItem(DISPLAY_NAME_STORAGE_KEY, displayName)
+        }
+      }
       window.location.href = state.redirectTo
     }
   }, [state.redirectTo])
@@ -60,7 +74,7 @@ export function CreateRoomForm() {
         <CardDescription>{t('createRoom.description')}</CardDescription>
       </CardHeader>
       <CardContent>
-        <form action={formAction} className="space-y-4">
+        <form id="create-room-form" action={formAction} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">{t('createRoom.roomName')}</Label>
             <Input
@@ -79,6 +93,8 @@ export function CreateRoomForm() {
               placeholder={t('createRoom.displayNamePlaceholder')}
               required
               maxLength={20}
+              defaultValue={savedDisplayName}
+              key={savedDisplayName}
             />
           </div>
 
