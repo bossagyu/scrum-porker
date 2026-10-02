@@ -40,6 +40,7 @@ export function RoomView({
     initialize({
       roomId: room.id,
       roomCode: room.code,
+      roomName: room.name,
       cardSet: room.card_set,
       timerDuration: room.timer_duration,
       autoReveal: room.auto_reveal,
@@ -56,6 +57,7 @@ export function RoomView({
   }, [
     room.id,
     room.code,
+    room.name,
     room.card_set,
     room.timer_duration,
     room.auto_reveal,
