@@ -44,3 +44,8 @@ export async function joinRoom(
 
   await page.waitForURL(/\/room\/[A-Z0-9]{6}$/)
 }
+
+export async function removeParticipant(page: Page, displayName: string): Promise<void> {
+  await page.getByRole('button', { name: `${displayName}を削除` }).click()
+  await page.getByRole('button', { name: '削除', exact: true }).click()
+}
