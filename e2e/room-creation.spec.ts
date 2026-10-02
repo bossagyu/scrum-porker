@@ -10,6 +10,13 @@ test.describe('Room Creation', () => {
     await expect(page.getByText(`Room: ${code}`)).toBeVisible()
   })
 
+  test('should display the room name in the voting screen heading', async ({ page }) => {
+    const code = await createRoom(page, 'Sprint Planning', 'Alice')
+
+    await expect(page.getByRole('heading', { level: 1, name: 'Sprint Planning' })).toBeVisible()
+    await expect(page.getByText(`Room: ${code}`)).toBeVisible()
+  })
+
   test('should show the creator as a participant', async ({ page }) => {
     await createRoom(page, 'Estimation', 'Bob')
 
@@ -28,14 +35,15 @@ test.describe('Room Creation', () => {
     await expect(page.getByText('参加者 (1)')).toBeVisible()
   })
 
-  test('should show validation error when room name is empty', async ({
+  test('should create a room when room name is left empty', async ({
     page,
   }) => {
     await page.goto('/')
     await page.locator('#displayName').fill('TestUser')
     await page.getByRole('button', { name: 'ルームを作成' }).click()
 
-    await expect(page.locator('#name')).toHaveAttribute('required', '')
+    // ルーム名は任意入力のため、未入力でも作成されて遷移する
+    await page.waitForURL(/\/room\/[A-Z0-9]{6}$/)
   })
 
   test('should show validation error when display name is empty', async ({

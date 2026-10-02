@@ -11,6 +11,7 @@ type VoteRow = Database['public']['Tables']['votes']['Row']
 type RoomState = {
   readonly roomId: string | null
   readonly roomCode: string | null
+  readonly roomName: string | null
   readonly cardSet: string
   readonly timerDuration: number | null
   readonly autoReveal: boolean
@@ -30,6 +31,7 @@ type RoomActions = {
   initialize: (params: {
     readonly roomId: string
     readonly roomCode: string
+    readonly roomName: string | null
     readonly cardSet: string
     readonly timerDuration: number | null
     readonly autoReveal: boolean
@@ -50,6 +52,7 @@ type RoomStore = RoomState & RoomActions
 const initialState: RoomState = {
   roomId: null,
   roomCode: null,
+  roomName: null,
   cardSet: 'fibonacci',
   timerDuration: null,
   autoReveal: false,
@@ -71,6 +74,7 @@ export const useRoomStore = create<RoomStore>((set, get) => ({
     set({
       roomId: params.roomId,
       roomCode: params.roomCode,
+      roomName: params.roomName,
       cardSet: params.cardSet,
       timerDuration: params.timerDuration,
       autoReveal: params.autoReveal,
