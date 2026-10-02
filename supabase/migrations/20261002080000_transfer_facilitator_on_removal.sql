@@ -10,6 +10,9 @@
 -- 自体が設定項目なので、ファシリテーター不在のルームで誰かがそれを OFF にすると、
 -- 今度こそ誰も設定を開けない行き止まりになるため。
 --
+-- 同一ルームの削除は rooms 行のロックで直列化する（並行削除で昇格が
+-- どちらも起きない競合を防ぐため）。
+--
 -- 削除された側の is_facilitator は落とさない。元の主催者が再参加したときに
 -- 設定へ戻れる余地を残すため（ファシリテーターが複数居ても実害はない。
 -- get_my_facilitator_room_ids も複数行を返して問題なく動く）。
@@ -42,6 +45,12 @@ BEGIN
   ) THEN
     RAISE EXCEPTION 'permission denied: caller does not control this room';
   END IF;
+
+  -- 同一ルームの削除を直列化する。これが無いと READ COMMITTED では、
+  -- 2 人がほぼ同時に削除したときに互いの中間状態が見えず、
+  -- 「どちらの削除も昇格を起こさないまま両方コミットされ、
+  -- アクティブなファシリテーターが 0 になる」という本 issue の状態が再発する。
+  PERFORM 1 FROM rooms WHERE id = v_room_id FOR UPDATE;
 
   SELECT id INTO v_caller_participant_id
   FROM participants
