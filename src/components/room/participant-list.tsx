@@ -39,9 +39,13 @@ export function ParticipantList() {
               <li key={participant.id} className="flex items-center justify-between gap-2">
                 {/* min-w-0 がないと、折り返し機会の無い長い表示名で左側が
                     コンテンツ幅を主張し、Badge と Button の shrink-0 により
-                    右側が Card の外へ押し出される */}
-                <div className="flex min-w-0 items-center gap-2">
+                    右側が Card の外へ押し出される。
+                    flex-wrap はバッジを2行目に送るためのもので、これが無いと
+                    唯一 shrink できる名前が省略記号だけに潰れる（狭い
+                    サイドバーではバッジとボタンの固定幅だけで行幅をほぼ使う）。*/}
+                <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
                   <span
+                    data-testid="participant-name"
                     className={cn('truncate', isCurrentUser && 'font-bold')}
                     title={participant.display_name}
                   >
