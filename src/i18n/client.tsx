@@ -19,18 +19,15 @@ export function useLocale() {
 }
 
 export function I18nProvider({ children }: { readonly children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>('ja')
+  // detectLocale 自身が typeof window === 'undefined' を見て既定値を返すので、
+  // 遅延初期化で足りる。effect で上書きすると余分な再描画が1回増える。
+  const [locale, setLocaleState] = useState<Locale>(detectLocale)
   const [messages, setMessages] = useState<Record<string, unknown> | null>(null)
 
   const setLocale = (newLocale: Locale) => {
     setLocaleState(newLocale)
     localStorage.setItem('locale', newLocale)
   }
-
-  useEffect(() => {
-    const detected = detectLocale()
-    setLocaleState(detected)
-  }, [])
 
   useEffect(() => {
     getMessages(locale).then(setMessages)

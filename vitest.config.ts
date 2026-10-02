@@ -8,7 +8,10 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./src/test/setup.ts'],
-    exclude: ['e2e/**', 'node_modules/**'],
+    // node_modules/** はトップレベルにしか一致しない。エージェントの worktree
+    // （.claude/worktrees/*/node_modules）配下のテストまで収集してしまい、
+    // 実際に 1 万件超のライブラリのテストを拾って失敗した。
+    exclude: ['e2e/**', '**/node_modules/**', '.claude/**'],
   },
   resolve: {
     alias: {

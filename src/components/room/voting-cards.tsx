@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useTransition } from 'react'
+import { useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import { useRoomStore } from '@/stores/room-store'
 import { submitVote } from '@/actions/vote'
@@ -22,10 +22,16 @@ export function VotingCards() {
   const [selectedCard, setSelectedCard] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
+  // セッションが切り替わったら選択とエラーを捨てる。effect の中で setState すると
+  // 一度古い選択のまま描画してから再描画が走るので、React 公式の
+  // 「props が変わったときに描画中に state を調整する」パターンを使う。
+  // https://react.dev/learn/you-might-not-need-an-effect
+  const [lastSessionId, setLastSessionId] = useState(currentSession?.id ?? null)
+  if (lastSessionId !== (currentSession?.id ?? null)) {
+    setLastSessionId(currentSession?.id ?? null)
     setSelectedCard(null)
     setError(null)
-  }, [currentSession?.id])
+  }
 
   const isRevealed = currentSession?.is_revealed ?? false
   const hasSession = currentSession !== null
