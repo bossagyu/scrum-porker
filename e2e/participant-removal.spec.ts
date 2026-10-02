@@ -132,7 +132,7 @@ test.describe('Participant Removal', () => {
     await joinerContext.close()
   })
 
-  test('should let a removed participant rejoin without a redirect loop', async ({
+  test('should let a removed participant rejoin without a redirect loop, keeping the original display name', async ({
     browser,
   }) => {
     const facilitatorContext = await browser.newContext()
@@ -151,14 +151,21 @@ test.describe('Participant Removal', () => {
       timeout: 10_000,
     })
 
-    // Rejoin via the home page join form, reusing the same browser context (same auth session).
-    await joinRoom(joinerPage, code, 'Joiner')
+    // Rejoin via the home page join form, reusing the same browser context
+    // (same auth session) but typing a DIFFERENT display name. Reactivation
+    // must keep the original display_name ('Joiner') and ignore the new
+    // input ('Joiner2') -- otherwise this would silently start colliding
+    // with the UNIQUE(room_id, display_name) constraint on re-use.
+    await joinRoom(joinerPage, code, 'Joiner2')
 
     await expect(joinerPage).toHaveURL(new RegExp(`/room/${code}$`))
     await expect(joinerPage.getByText('カードを選択')).toBeVisible()
     await expect(facilitatorPage.getByText('Joiner', { exact: true })).toBeVisible({
       timeout: 10_000,
     })
+    await expect(facilitatorPage.getByText('Joiner2', { exact: true })).not.toBeVisible()
+    await expect(joinerPage.getByText('Joiner', { exact: true })).toBeVisible()
+    await expect(joinerPage.getByText('Joiner2', { exact: true })).not.toBeVisible()
 
     await facilitatorContext.close()
     await joinerContext.close()
