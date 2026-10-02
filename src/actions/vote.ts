@@ -14,6 +14,16 @@ export async function submitVote(
   try {
     const supabase = await createServerSupabaseClient()
 
+    const { data: participant, error: participantError } = await supabase
+      .from('participants')
+      .select('is_active')
+      .eq('id', participantId)
+      .single()
+
+    if (participantError || !participant?.is_active) {
+      return { error: 'errors.participantRemoved' }
+    }
+
     const { error } = await supabase.from('votes').upsert(
       {
         session_id: sessionId,
