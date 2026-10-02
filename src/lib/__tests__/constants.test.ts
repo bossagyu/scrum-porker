@@ -129,6 +129,14 @@ describe('isAllowedCardValue', () => {
     expect(isAllowedCardValue('fibonacci', null, '7')).toBe(false)
   })
 
+  it('rejects invisible characters', () => {
+    // DB の CHECK 制約は btrim() では U+0020 しか削れず、これらが通ってしまった。
+    // Server Action 側はカード集合との照合なので最初から弾ける。
+    for (const v of ['\u00a0', '\u200b', '\u3000', '\t', '\n', '\u2007']) {
+      expect(isAllowedCardValue('fibonacci', null, v)).toBe(false)
+    }
+  })
+
   it('rejects a card from a different card set', () => {
     // フィボナッチのルームに T シャツの値は投げられない
     expect(isAllowedCardValue('fibonacci', null, 'M')).toBe(false)

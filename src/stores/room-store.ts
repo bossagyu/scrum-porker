@@ -43,6 +43,7 @@ type RoomActions = {
     readonly currentParticipantId: string
   }) => void
   addOptimisticVote: (participantId: string, cardValue: string) => void
+  rollbackOptimisticVote: (participantId: string, previousValue: string | null) => void
   subscribe: () => () => void
   reset: () => void
 }
@@ -111,6 +112,25 @@ export const useRoomStore = create<RoomStore>((set, get) => ({
     }
   },
 
+  // サーバー側で投票が拒否されたときに楽観更新を取り消す。これが無いと
+  // 「投票済み」のまま次のポーリング（3秒）まで残り、無言で消える。
+  rollbackOptimisticVote: (participantId, previousValue) => {
+    const state = get()
+    if (previousValue === null) {
+      set({
+        votes: state.votes.filter(
+          (v) => !(v.participant_id === participantId && v.id.startsWith('optimistic-')),
+        ),
+      })
+      return
+    }
+    set({
+      votes: state.votes.map((v) =>
+        v.participant_id === participantId ? { ...v, card_value: previousValue } : v,
+      ),
+    })
+  },
+
   subscribe: () => {
     const { roomId } = get()
     if (!roomId) return () => {}
@@ -153,10 +173,7 @@ export const useRoomStore = create<RoomStore>((set, get) => ({
       }
     }
 
-    const handleVotingSessions = (
-      eventType: string,
-      newRecord: Record<string, unknown> | null,
-    ) => {
+    const handleVotingSessions = (eventType: string, newRecord: Record<string, unknown> | null) => {
       if (eventType === 'INSERT' && newRecord) {
         set({
           currentSession: newRecord as unknown as VotingSessionRow,
@@ -238,13 +255,15 @@ export const useRoomStore = create<RoomStore>((set, get) => ({
     }
 
     const handleBroadcast = (eventType: string, raw: Record<string, unknown>) => {
-      const inner = raw.payload as {
-        table: string
-        schema: string
-        record: Record<string, unknown> | null
-        old_record: Record<string, unknown> | null
-        operation: string
-      } | undefined
+      const inner = raw.payload as
+        | {
+            table: string
+            schema: string
+            record: Record<string, unknown> | null
+            old_record: Record<string, unknown> | null
+            operation: string
+          }
+        | undefined
       if (!inner || typeof inner.table !== 'string') return
       const { table, record, old_record } = inner
       switch (table) {
@@ -275,10 +294,7 @@ export const useRoomStore = create<RoomStore>((set, get) => ({
       const sessionId = state.currentSession?.id
       if (!sessionId) return
 
-      const { data: votes } = await supabase
-        .from('votes')
-        .select('*')
-        .eq('session_id', sessionId)
+      const { data: votes } = await supabase.from('votes').select('*').eq('session_id', sessionId)
 
       if (votes) {
         set({ votes })
