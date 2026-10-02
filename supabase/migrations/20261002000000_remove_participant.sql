@@ -55,17 +55,24 @@ BEGIN
     );
 
   -- Removing a participant can complete the remaining voters' set (they may
-  -- have already voted before this participant left). Re-run the auto-reveal
-  -- check for every unrevealed session in the room so the room doesn't get
-  -- stuck showing "N/N voted" with no one left to trigger a reveal.
-  -- auto_reveal_if_complete is idempotent (it checks is_revealed/auto_reveal
-  -- itself), so looping over all unrevealed sessions is safe.
-  FOR v_session_id IN
-    SELECT id FROM voting_sessions
-    WHERE room_id = v_room_id AND is_revealed = false
-  LOOP
+  -- have already voted before this participant left), so re-run the
+  -- auto-reveal check. Only the room's latest session is considered: the UI
+  -- (page.tsx / room-store.ts) only ever reads the newest session, and
+  -- resetVoting inserts unconditionally, so older unrevealed sessions can
+  -- linger. Revealing those would make ghost rounds with partial votes
+  -- appear in the session history (history.ts filters is_revealed = true).
+  -- No is_revealed filter here on purpose: if the latest session is already
+  -- revealed, auto_reveal_if_complete checks is_revealed/auto_reveal itself
+  -- and is a no-op.
+  SELECT id INTO v_session_id
+  FROM voting_sessions
+  WHERE room_id = v_room_id
+  ORDER BY created_at DESC
+  LIMIT 1;
+
+  IF v_session_id IS NOT NULL THEN
     PERFORM public.auto_reveal_if_complete(v_session_id);
-  END LOOP;
+  END IF;
 
   RETURN TRUE;
 END;
