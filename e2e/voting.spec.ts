@@ -26,6 +26,7 @@ test.describe('Voting Flow', () => {
       facilitatorPage,
       'Reveal Test',
       'Facilitator',
+      { autoReveal: false },
     )
 
     const joinerContext = await browser.newContext()

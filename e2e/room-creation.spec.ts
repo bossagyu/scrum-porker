@@ -35,14 +35,15 @@ test.describe('Room Creation', () => {
     await expect(page.getByText('参加者 (1)')).toBeVisible()
   })
 
-  test('should show validation error when room name is empty', async ({
+  test('should create a room when room name is left empty', async ({
     page,
   }) => {
     await page.goto('/')
     await page.locator('#displayName').fill('TestUser')
     await page.getByRole('button', { name: 'ルームを作成' }).click()
 
-    await expect(page.locator('#name')).toHaveAttribute('required', '')
+    // ルーム名は任意入力のため、未入力でも作成されて遷移する
+    await page.waitForURL(/\/room\/[A-Z0-9]{6}$/)
   })
 
   test('should show validation error when display name is empty', async ({
