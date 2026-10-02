@@ -16,6 +16,7 @@ type RoomHeaderProps = {
 export function RoomHeader({ onToggleHistory }: RoomHeaderProps) {
   const t = useTranslations()
   const roomCode = useRoomStore((s) => s.roomCode)
+  const roomName = useRoomStore((s) => s.roomName)
   const roomId = useRoomStore((s) => s.roomId)
   const currentSession = useRoomStore((s) => s.currentSession)
   const participants = useRoomStore((s) => s.participants)
@@ -52,7 +53,14 @@ export function RoomHeader({ onToggleHistory }: RoomHeaderProps) {
     <div className="flex flex-wrap items-center justify-between gap-2">
       <div className="flex items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Room: {roomCode}</h1>
+          {roomName ? (
+            <>
+              <h1 className="text-2xl font-bold">{roomName}</h1>
+              <p className="text-muted-foreground text-sm">Room: {roomCode}</p>
+            </>
+          ) : (
+            <h1 className="text-2xl font-bold">Room: {roomCode}</h1>
+          )}
           {currentSession?.topic && (
             <p className="text-muted-foreground text-sm">
               {currentSession.topic}
