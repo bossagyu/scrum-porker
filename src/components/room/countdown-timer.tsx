@@ -17,13 +17,26 @@ export function CountdownTimer() {
   const sessionCreatedAt = currentSession?.created_at ?? null
   const isRevealed = currentSession?.is_revealed ?? false
 
+  // タイマーを出すかどうかはストアの値だけで決まるので state を持たない。
+  // 「出さない」ケースで setRemainingSeconds(null) を effect から呼んでいたが、
+  // この分岐は Date.now を読んでおらず effect である必要が無かった。
+  const isTimerActive = Boolean(timerDuration) && Boolean(sessionCreatedAt) && !isRevealed
+
+  // セッションが切り替わったら前ラウンドの残り秒数を捨てる。effect でやると
+  // 一瞬だけ古い秒数が描画されるため、描画中に調整する。
+  // https://react.dev/learn/you-might-not-need-an-effect
+  const [lastSessionId, setLastSessionId] = useState(sessionId)
+  if (lastSessionId !== sessionId) {
+    setLastSessionId(sessionId)
+    setRemainingSeconds(null)
+  }
+
   useEffect(() => {
     hasTriggeredReveal.current = false
   }, [sessionId])
 
   useEffect(() => {
-    if (!timerDuration || !sessionCreatedAt || isRevealed) {
-      setRemainingSeconds(null)
+    if (!isTimerActive || !timerDuration || !sessionCreatedAt) {
       return
     }
 
@@ -33,6 +46,9 @@ export function CountdownTimer() {
       return Math.max(0, Math.ceil((endTime - now) / 1000))
     }
 
+    // 残り秒数はブラウザの時計（Date.now）からしか決まらない。描画中に求めると
+    // 描画のたびに値が変わる純粋でない計算になるため、ここは effect が必要。
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setRemainingSeconds(calculateRemaining())
 
     const interval = setInterval(() => {
@@ -46,9 +62,9 @@ export function CountdownTimer() {
     }, 1000)
 
     return () => clearInterval(interval)
-  }, [timerDuration, sessionCreatedAt, sessionId, isRevealed])
+  }, [isTimerActive, timerDuration, sessionCreatedAt, sessionId])
 
-  if (remainingSeconds === null) {
+  if (!isTimerActive || remainingSeconds === null) {
     return null
   }
 

@@ -6,7 +6,12 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { CARD_SETS, type CardSetType, DISPLAY_NAME_STORAGE_KEY, TIMER_OPTIONS } from '@/lib/constants'
+import {
+  CARD_SETS,
+  type CardSetType,
+  DISPLAY_NAME_STORAGE_KEY,
+  TIMER_OPTIONS,
+} from '@/lib/constants'
 import { createRoom, type CreateRoomState } from '@/actions/room'
 
 const initialState: CreateRoomState = {}
@@ -25,6 +30,9 @@ export function CreateRoomForm() {
     try {
       const saved = localStorage.getItem(DISPLAY_NAME_STORAGE_KEY)
       if (saved) {
+        // localStorage はサーバーに存在しないため、マウント後にしか読めない。
+        // 読んだ値は displayNameRef の同期にも使うので effect のままにする。
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setSavedDisplayName(saved)
         displayNameRef.current = saved
       }
@@ -148,9 +156,7 @@ export function CreateRoomForm() {
                     validateCustomCards(e.target.value)
                   }}
                 />
-                {customCardsError && (
-                  <p className="text-xs text-destructive">{customCardsError}</p>
-                )}
+                {customCardsError && <p className="text-xs text-destructive">{customCardsError}</p>}
               </div>
             )}
           </div>
