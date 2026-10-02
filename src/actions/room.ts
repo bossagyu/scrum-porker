@@ -31,7 +31,12 @@ const createRoomSchema = z
   .refine(
     (data) => {
       if (data.cardSet === 'custom') {
-        return !!data.customCards && data.customCards.length >= 2 && data.customCards.length <= 20
+        if (!data.customCards || data.customCards.length < 2 || data.customCards.length > 20) {
+          return false
+        }
+        // !isNaN(Number(card)) だと 'Infinity' / '1e3' / '0x10' / '-3' を通してしまい、
+        // カード面の文字列と統計に使われる値が食い違う（Infinity は平均を壊す）
+        return data.customCards.every(isValidCustomCardValue)
       }
       return true
     },
