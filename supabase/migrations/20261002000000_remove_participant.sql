@@ -12,6 +12,7 @@ AS $$
 DECLARE
   v_room_id UUID;
   v_caller_participant_id UUID;
+  v_session_id UUID;
 BEGIN
   SELECT room_id INTO v_room_id
   FROM participants
@@ -21,7 +22,12 @@ BEGIN
     RETURN FALSE;
   END IF;
 
-  IF v_room_id NOT IN (SELECT public.get_my_controllable_room_ids()) THEN
+  -- NOT EXISTS rather than NOT IN: safe even if get_my_controllable_room_ids()
+  -- is ever changed to return a NULL row (NOT IN would then silently reject
+  -- every caller).
+  IF NOT EXISTS (
+    SELECT 1 FROM public.get_my_controllable_room_ids() AS id WHERE id = v_room_id
+  ) THEN
     RAISE EXCEPTION 'permission denied: caller does not control this room';
   END IF;
 
@@ -47,6 +53,19 @@ BEGIN
       SELECT id FROM voting_sessions
       WHERE room_id = v_room_id AND is_revealed = false
     );
+
+  -- Removing a participant can complete the remaining voters' set (they may
+  -- have already voted before this participant left). Re-run the auto-reveal
+  -- check for every unrevealed session in the room so the room doesn't get
+  -- stuck showing "N/N voted" with no one left to trigger a reveal.
+  -- auto_reveal_if_complete is idempotent (it checks is_revealed/auto_reveal
+  -- itself), so looping over all unrevealed sessions is safe.
+  FOR v_session_id IN
+    SELECT id FROM voting_sessions
+    WHERE room_id = v_room_id AND is_revealed = false
+  LOOP
+    PERFORM public.auto_reveal_if_complete(v_session_id);
+  END LOOP;
 
   RETURN TRUE;
 END;
