@@ -6,7 +6,8 @@
     "close": "Close",
     "save": "Save",
     "saving": "Saving...",
-    "settings": "Settings"
+    "settings": "Settings",
+    "cancel": "Cancel"
   },
   "theme": {
     "light": "Light",
@@ -47,7 +48,8 @@
     "selectCard": "Select a Card",
     "observerCannotVote": "Observers cannot vote",
     "noSession": "No voting session has started yet",
-    "result": "Voting Results"
+    "result": "Voting Results",
+    "removedFromRoom": "You have been removed from this room"
   },
   "cardSets": {
     "fibonacci": "Fibonacci Sequence",
@@ -69,7 +71,10 @@
     "facilitator": "Facilitator",
     "observer": "Observer",
     "voted": "Voted",
-    "notVoted": "Not Voted"
+    "notVoted": "Not Voted",
+    "removeAriaLabel": "Remove {name}",
+    "removeConfirmTitle": "Remove {name} from the room?",
+    "removeConfirm": "Remove"
   },
   "roomHeader": {
     "reveal": "Reveal Results",
@@ -133,6 +138,9 @@
     "historyFetch": "Failed to fetch history",
     "invalidSession": "Invalid session ID",
     "invalidRoom": "Invalid room ID",
+    "removeParticipant": "Failed to remove participant",
+    "removeParticipantFailed": "Could not remove participant",
+    "participantRemoved": "This participant has been removed from the room",
     "unknown": "Unknown"
   },
   "validation": {

@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl'
 import { useRoomStore } from '@/stores/room-store'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { RemoveParticipantButton } from './remove-participant-button'
 
 export function ParticipantList() {
   const t = useTranslations()
@@ -11,9 +12,12 @@ export function ParticipantList() {
   const votes = useRoomStore((s) => s.votes)
   const currentSession = useRoomStore((s) => s.currentSession)
   const currentParticipantId = useRoomStore((s) => s.currentParticipantId)
+  const allowAllControl = useRoomStore((s) => s.allowAllControl)
 
   const hasSession = currentSession !== null
   const votedParticipantIds = new Set(votes.map((v) => v.participant_id))
+  const currentParticipant = participants.find((p) => p.id === currentParticipantId)
+  const canRemove = (currentParticipant?.is_facilitator ?? false) || allowAllControl
 
   return (
     <Card>
@@ -42,14 +46,22 @@ export function ParticipantList() {
                     <Badge variant="outline">{t('participant.observer')}</Badge>
                   )}
                 </div>
-                {hasSession && !participant.is_observer && (
-                  <Badge
-                    variant={hasVoted ? 'default' : 'outline'}
-                    className={hasVoted ? '' : 'bg-muted'}
-                  >
-                    {hasVoted ? t('participant.voted') : t('participant.notVoted')}
-                  </Badge>
-                )}
+                <div className="flex items-center gap-2">
+                  {hasSession && !participant.is_observer && (
+                    <Badge
+                      variant={hasVoted ? 'default' : 'outline'}
+                      className={hasVoted ? '' : 'bg-muted'}
+                    >
+                      {hasVoted ? t('participant.voted') : t('participant.notVoted')}
+                    </Badge>
+                  )}
+                  {canRemove && !isCurrentUser && (
+                    <RemoveParticipantButton
+                      participantId={participant.id}
+                      displayName={participant.display_name}
+                    />
+                  )}
+                </div>
               </li>
             )
           })}

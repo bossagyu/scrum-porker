@@ -16,6 +16,7 @@ export function VotingCards() {
   const currentParticipantId = useRoomStore((s) => s.currentParticipantId)
   const votes = useRoomStore((s) => s.votes)
   const participants = useRoomStore((s) => s.participants)
+  const addOptimisticVote = useRoomStore((s) => s.addOptimisticVote)
   const [isPending, startTransition] = useTransition()
   const [selectedCard, setSelectedCard] = useState<string | null>(null)
 
@@ -32,12 +33,20 @@ export function VotingCards() {
 
   const cards = getCardsForRoom(cardSet, customCards)
 
+  if (!currentParticipant) {
+    return (
+      <Card>
+        <CardContent className="py-8 text-center">
+          <p className="text-muted-foreground">{t('voting.removedFromRoom')}</p>
+        </CardContent>
+      </Card>
+    )
+  }
+
   const currentVote = votes.find(
     (v) => v.participant_id === currentParticipantId,
   )
   const displaySelected = selectedCard ?? currentVote?.card_value ?? null
-
-  const addOptimisticVote = useRoomStore((s) => s.addOptimisticVote)
 
   const handleSelect = (value: string) => {
     if (!currentSession?.id || !currentParticipantId || isRevealed || isObserver) {
