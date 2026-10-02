@@ -10,6 +10,11 @@ pnpm dev                    # Start dev server (Turbopack, port 3000)
 npx supabase start          # Start local Supabase Docker (required first)
 npx supabase db reset       # Reset DB and re-run all migrations
 
+# Production database (migrations are NOT applied by the Vercel deploy)
+npx supabase migration list # Compare applied migrations: local vs remote
+npx supabase db push --dry-run  # Preview what would be applied to production
+npx supabase db push        # Apply pending migrations to production Supabase
+
 # Testing
 pnpm test                   # Vitest unit tests (single run)
 pnpm test:watch             # Vitest watch mode
@@ -68,6 +73,7 @@ Scrum Poker real-time estimation app: Next.js 16 App Router + Supabase + Zustand
 
 ### ワークフロー
 - DB スキーマを変更したら `supabase/migrations/` に新しいマイグレーションファイルを作成し、`npx supabase db reset` で適用する
+- **マイグレーションを含む PR をマージしたら、本番 Supabase にも適用する**（`npx supabase migration list` で local と remote の差分を確認し、`npx supabase db push --dry-run` で内容を確認してから `npx supabase db push`）。Vercel は main へのマージでアプリだけを自動デプロイするため、これを忘れると**本番だけ新しい UI と古い DB の組み合わせになり、RPC が 404 になって機能が壊れる**
 - `src/lib/supabase/types.ts` は手動管理。テーブルやRPC関数を追加・変更したら必ずこのファイルも更新する
 - コードを変更・追加したら、必ず関連するテスト (`pnpm test` / `pnpm test:e2e`) を実行して通ることを確認する
 - E2E テストを追加したら `pnpm test:e2e` で既存テストを含め全テスト通過を確認する
