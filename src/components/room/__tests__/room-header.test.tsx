@@ -29,9 +29,7 @@ describe('RoomHeader', () => {
 
     renderRoomHeader()
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'スプリント27計画' }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: 'スプリント27計画' })).toBeInTheDocument()
   })
 
   it('ルーム名がある場合でも、ルームコードが画面上に表示される', () => {
@@ -55,8 +53,18 @@ describe('RoomHeader', () => {
 
     renderRoomHeader()
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Room: ABC123' }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: 'Room: ABC123' })).toBeInTheDocument()
+  })
+
+  it('ルーム名が空文字の場合（未入力で作成された本番データ）、見出しに Room: <コード> が表示される', () => {
+    useRoomStore.setState({
+      roomId: 'room-1',
+      roomCode: 'ABC123',
+      roomName: '',
+    })
+
+    renderRoomHeader()
+
+    expect(screen.getByRole('heading', { level: 1, name: 'Room: ABC123' })).toBeInTheDocument()
   })
 })

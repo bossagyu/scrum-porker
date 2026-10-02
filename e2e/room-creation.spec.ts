@@ -13,9 +13,7 @@ test.describe('Room Creation', () => {
   test('should display the room name in the voting screen heading', async ({ page }) => {
     const code = await createRoom(page, 'Sprint Planning', 'Alice')
 
-    await expect(
-      page.getByRole('heading', { level: 1, name: 'Sprint Planning' }),
-    ).toBeVisible()
+    await expect(page.getByRole('heading', { level: 1, name: 'Sprint Planning' })).toBeVisible()
     await expect(page.getByText(`Room: ${code}`)).toBeVisible()
   })
 
