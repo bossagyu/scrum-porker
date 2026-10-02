@@ -2,39 +2,49 @@
 
 import { z } from 'zod'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
-import { generateRoomCode } from '@/lib/room-utils'
+import { generateRoomCode, isValidCustomCardValue } from '@/lib/room-utils'
 
-const createRoomSchema = z.object({
-  name: z.string().max(100, 'validation.roomNameMax').default(''),
-  cardSet: z.enum(['fibonacci', 'tshirt', 'powerOf2', 'custom']),
-  customCards: z
-    .string()
-    .optional()
-    .transform((val) => {
-      if (!val) return undefined
-      return val.split(',').map((v) => v.trim()).filter(Boolean)
-    }),
-  autoReveal: z.boolean().default(true),
-  allowAllControl: z.boolean().default(true),
-  timerDuration: z
-    .union([z.literal(30), z.literal(60), z.literal(120), z.literal(300), z.null()])
-    .default(null),
-  displayName: z
-    .string()
-    .min(1, 'validation.displayNameRequired')
-    .max(20, 'validation.displayNameMax'),
-}).refine((data) => {
-  if (data.cardSet === 'custom') {
-    if (!data.customCards || data.customCards.length < 2 || data.customCards.length > 20) {
-      return false
-    }
-    return data.customCards.every((card) => !isNaN(Number(card)))
-  }
-  return true
-}, {
-  message: 'validation.customCardsInvalid',
-  path: ['customCards'],
-})
+const createRoomSchema = z
+  .object({
+    name: z.string().max(100, 'validation.roomNameMax').default(''),
+    cardSet: z.enum(['fibonacci', 'tshirt', 'powerOf2', 'custom']),
+    customCards: z
+      .string()
+      .optional()
+      .transform((val) => {
+        if (!val) return undefined
+        return val
+          .split(',')
+          .map((v) => v.trim())
+          .filter(Boolean)
+      }),
+    autoReveal: z.boolean().default(true),
+    allowAllControl: z.boolean().default(true),
+    timerDuration: z
+      .union([z.literal(30), z.literal(60), z.literal(120), z.literal(300), z.null()])
+      .default(null),
+    displayName: z
+      .string()
+      .min(1, 'validation.displayNameRequired')
+      .max(20, 'validation.displayNameMax'),
+  })
+  .refine(
+    (data) => {
+      if (data.cardSet === 'custom') {
+        if (!data.customCards || data.customCards.length < 2 || data.customCards.length > 20) {
+          return false
+        }
+        // !isNaN(Number(card)) だと 'Infinity' / '1e3' / '0x10' / '-3' を通してしまい、
+        // カード面の文字列と統計に使われる値が食い違う（Infinity は平均を壊す）
+        return data.customCards.every(isValidCustomCardValue)
+      }
+      return true
+    },
+    {
+      message: 'validation.customCardsInvalid',
+      path: ['customCards'],
+    },
+  )
 
 const joinRoomSchema = z.object({
   roomCode: z.string().min(1, 'validation.roomCodeRequired'),
@@ -213,27 +223,34 @@ export async function getRoomByCode(code: string) {
   return room
 }
 
-const updateRoomSettingsSchema = z.object({
-  roomId: z.string().uuid(),
-  cardSet: z.enum(['fibonacci', 'tshirt', 'powerOf2', 'custom']),
-  customCards: z.array(z.string()).optional(),
-  timerDuration: z
-    .union([z.literal(30), z.literal(60), z.literal(120), z.literal(300), z.null()])
-    .default(null),
-  autoReveal: z.boolean(),
-  allowAllControl: z.boolean(),
-}).refine((data) => {
-  if (data.cardSet === 'custom') {
-    if (!data.customCards || data.customCards.length < 2 || data.customCards.length > 20) {
-      return false
-    }
-    return data.customCards.every((card) => !isNaN(Number(card)))
-  }
-  return true
-}, {
-  message: 'validation.customCardsInvalid',
-  path: ['customCards'],
-})
+const updateRoomSettingsSchema = z
+  .object({
+    roomId: z.string().uuid(),
+    cardSet: z.enum(['fibonacci', 'tshirt', 'powerOf2', 'custom']),
+    customCards: z.array(z.string()).optional(),
+    timerDuration: z
+      .union([z.literal(30), z.literal(60), z.literal(120), z.literal(300), z.null()])
+      .default(null),
+    autoReveal: z.boolean(),
+    allowAllControl: z.boolean(),
+  })
+  .refine(
+    (data) => {
+      if (data.cardSet === 'custom') {
+        if (!data.customCards || data.customCards.length < 2 || data.customCards.length > 20) {
+          return false
+        }
+        // !isNaN(Number(card)) だと 'Infinity' / '1e3' / '0x10' / '-3' を通してしまい、
+        // カード面の文字列と統計に使われる値が食い違う（Infinity は平均を壊す）
+        return data.customCards.every(isValidCustomCardValue)
+      }
+      return true
+    },
+    {
+      message: 'validation.customCardsInvalid',
+      path: ['customCards'],
+    },
+  )
 
 export type UpdateRoomSettingsState = {
   readonly error?: string
