@@ -17,7 +17,11 @@ export function ParticipantList() {
   const hasSession = currentSession !== null
   const votedParticipantIds = new Set(votes.map((v) => v.participant_id))
   const currentParticipant = participants.find((p) => p.id === currentParticipantId)
-  const canRemove = (currentParticipant?.is_facilitator ?? false) || allowAllControl
+  // currentParticipant === undefined means the current user has themselves
+  // been removed from the room; they must not get a (non-functional) button
+  // to remove someone else.
+  const canRemove =
+    currentParticipant !== undefined && (currentParticipant.is_facilitator || allowAllControl)
 
   return (
     <Card>
