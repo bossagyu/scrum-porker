@@ -5,23 +5,18 @@ import { useTranslations } from 'next-intl'
 import { useRoomStore } from '@/stores/room-store'
 import { getSessionHistory, type SessionHistoryEntry } from '@/actions/history'
 import { generateCsv, generateJson, downloadFile, type ExportSession } from '@/lib/export-utils'
-import { SPECIAL_CARDS } from '@/lib/constants'
+import { calculateAverage } from '@/lib/room-utils'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
-function calculateSessionAverage(
-  votes: readonly { readonly cardValue: string }[],
-): string {
-  const numericVotes = votes
-    .map((v) => v.cardValue)
-    .filter((v) => !SPECIAL_CARDS.includes(v as (typeof SPECIAL_CARDS)[number]))
-    .map(Number)
-    .filter((n) => !isNaN(n))
-
-  if (numericVotes.length === 0) return '---'
-  const avg = numericVotes.reduce((sum, v) => sum + v, 0) / numericVotes.length
-  return avg.toFixed(1)
+// 平均の計算は統計カードと同じ calculateAverage に委ねる。
+// 以前はここに同じロジックが複製されており、!isNaN(Number(v)) だったため
+// '' や ' ' が 0 として算入され、同じセッションでも統計カードと履歴で
+// 平均が食い違っていた。
+function calculateSessionAverage(votes: readonly { readonly cardValue: string }[]): string {
+  const average = calculateAverage(votes.map((v) => v.cardValue))
+  return average !== null ? average.toFixed(1) : '---'
 }
 
 type SessionHistoryProps = {

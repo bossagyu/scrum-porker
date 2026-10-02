@@ -138,9 +138,7 @@ export function RoomSettingsDialog() {
                   value={customCardsInput}
                   onChange={(e) => setCustomCardsInput(e.target.value)}
                 />
-                <p className="text-xs text-muted-foreground">
-                  {t('cardSets.specialCardsNote')}
-                </p>
+                <p className="text-xs text-muted-foreground">{t('cardSets.specialCardsNote')}</p>
               </div>
             )}
           </div>
@@ -185,14 +183,12 @@ export function RoomSettingsDialog() {
               onChange={(e) => setAllowAllControl(e.target.checked)}
               className="accent-primary"
             />
-            <Label htmlFor="settingsAllowAllControl">
-              {t('createRoom.allowAllControl')}
-            </Label>
+            <Label htmlFor="settingsAllowAllControl">{t('createRoom.allowAllControl')}</Label>
           </div>
 
           {error && (
             <p className="text-sm text-destructive" role="alert">
-              {error}
+              {t(error)}
             </p>
           )}
 

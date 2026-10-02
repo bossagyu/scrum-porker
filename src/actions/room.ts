@@ -31,12 +31,7 @@ const createRoomSchema = z
   .refine(
     (data) => {
       if (data.cardSet === 'custom') {
-        if (!data.customCards || data.customCards.length < 2 || data.customCards.length > 20) {
-          return false
-        }
-        // !isNaN(Number(card)) だと 'Infinity' / '1e3' / '0x10' / '-3' を通してしまい、
-        // カード面の文字列と統計に使われる値が食い違う（Infinity は平均を壊す）
-        return data.customCards.every(isValidCustomCardValue)
+        return !!data.customCards && data.customCards.length >= 2 && data.customCards.length <= 20
       }
       return true
     },
@@ -227,7 +222,7 @@ const updateRoomSettingsSchema = z
   .object({
     roomId: z.string().uuid(),
     cardSet: z.enum(['fibonacci', 'tshirt', 'powerOf2', 'custom']),
-    customCards: z.array(z.string()).optional(),
+    customCards: z.array(z.string().transform((v) => v.trim())).optional(),
     timerDuration: z
       .union([z.literal(30), z.literal(60), z.literal(120), z.literal(300), z.null()])
       .default(null),
@@ -237,12 +232,7 @@ const updateRoomSettingsSchema = z
   .refine(
     (data) => {
       if (data.cardSet === 'custom') {
-        if (!data.customCards || data.customCards.length < 2 || data.customCards.length > 20) {
-          return false
-        }
-        // !isNaN(Number(card)) だと 'Infinity' / '1e3' / '0x10' / '-3' を通してしまい、
-        // カード面の文字列と統計に使われる値が食い違う（Infinity は平均を壊す）
-        return data.customCards.every(isValidCustomCardValue)
+        return !!data.customCards && data.customCards.length >= 2 && data.customCards.length <= 20
       }
       return true
     },
@@ -282,6 +272,27 @@ export async function updateRoomSettings(
 
     if (!participant?.is_facilitator) {
       return { error: 'errors.permissionDenied' }
+    }
+
+    if (parsed.data.cardSet === 'custom') {
+      // 設定ダイアログは変更していない項目も含めて現在のカード集合をそのまま再送する。
+      // そのため、以前の緩い検証（!isNaN(Number(card))）で作られた 'Infinity' や '-3' を
+      // 含むルームでは、カードを直さない限りタイマーや自動公開の変更すら保存できなくなる。
+      // カード集合を実際に変更したときだけ形式を検証する。
+      const { data: room } = await supabase
+        .from('rooms')
+        .select('custom_cards')
+        .eq('id', parsed.data.roomId)
+        .single()
+
+      const submitted = parsed.data.customCards ?? []
+      const stored = room?.custom_cards ?? []
+      const unchanged =
+        submitted.length === stored.length && submitted.every((card, i) => card === stored[i])
+
+      if (!unchanged && !submitted.every(isValidCustomCardValue)) {
+        return { error: 'validation.customCardsInvalid' }
+      }
     }
 
     const { error } = await supabase
