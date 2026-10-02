@@ -23,10 +23,7 @@ export type CardSetType = keyof typeof CARD_SETS
 export const SPECIAL_CARDS = ['?', '∞', '☕'] as const
 
 // Get cards for a room, merging custom cards with special cards if custom
-export function getCardsForRoom(
-  cardSet: string,
-  customCards: string[] | null,
-): readonly string[] {
+export function getCardsForRoom(cardSet: string, customCards: string[] | null): readonly string[] {
   if (cardSet === 'custom') {
     if (customCards && customCards.length > 0) {
       return [...customCards, ...SPECIAL_CARDS]
@@ -35,6 +32,18 @@ export function getCardsForRoom(
   }
   const preset = CARD_SETS[cardSet as CardSetType]
   return preset ? preset.cards : CARD_SETS.fibonacci.cards
+}
+
+// A vote must be one of the cards actually offered by the room. Without this,
+// a crafted request can store any string and it shows up in the statistics
+// (a blank value becomes an empty block in the mode slot, 'Infinity' is
+// displayed as the mode, and so on).
+export function isAllowedCardValue(
+  cardSet: string,
+  customCards: string[] | null,
+  value: string,
+): boolean {
+  return getCardsForRoom(cardSet, customCards).includes(value)
 }
 
 // Timer duration options in seconds (null = no timer)

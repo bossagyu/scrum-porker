@@ -1,12 +1,9 @@
 'use server'
 
 import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { isAllowedCardValue } from '@/lib/constants'
 
-export async function submitVote(
-  sessionId: string,
-  participantId: string,
-  cardValue: string,
-) {
+export async function submitVote(sessionId: string, participantId: string, cardValue: string) {
   if (!sessionId || !participantId || !cardValue) {
     return { error: 'errors.invalidInput' }
   }
@@ -16,12 +13,43 @@ export async function submitVote(
 
     const { data: participant, error: participantError } = await supabase
       .from('participants')
-      .select('is_active')
+      .select('is_active, room_id')
       .eq('id', participantId)
       .single()
 
     if (participantError || !participant?.is_active) {
       return { error: 'errors.participantRemoved' }
+    }
+
+    // カード集合はセッション側のルームから引く。participant 側から引くと、
+    // 別ルームの participant と組み合わせた細工リクエストで、検証に使う
+    // カード集合と実際に書き込まれるセッションがずれる。
+    const { data: session, error: sessionError } = await supabase
+      .from('voting_sessions')
+      .select('room_id')
+      .eq('id', sessionId)
+      .single()
+
+    if (sessionError || !session) {
+      return { error: 'errors.invalidSession' }
+    }
+
+    if (session.room_id !== participant.room_id) {
+      return { error: 'errors.invalidInput' }
+    }
+
+    const { data: room, error: roomError } = await supabase
+      .from('rooms')
+      .select('card_set, custom_cards')
+      .eq('id', session.room_id)
+      .single()
+
+    if (roomError || !room) {
+      return { error: 'errors.invalidRoom' }
+    }
+
+    if (!isAllowedCardValue(room.card_set, room.custom_cards, cardValue)) {
+      return { error: 'errors.invalidInput' }
     }
 
     const { error } = await supabase.from('votes').upsert(
