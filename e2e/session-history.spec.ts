@@ -34,6 +34,7 @@ test.describe('Session History', () => {
       facilitatorPage,
       'History Round Test',
       'Facilitator',
+      { autoReveal: false },
     )
 
     const joinerContext = await browser.newContext()
