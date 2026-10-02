@@ -25,7 +25,7 @@ test.describe('Room Header Layout', () => {
     await context.close()
   })
 
-  test('should truncate a long room name and expose it via the title attribute', async ({
+  test('should clamp a long room name and expose it via the title attribute', async ({
     browser,
   }) => {
     const context = await browser.newContext({ viewport: { width: 375, height: 800 } })
@@ -35,12 +35,49 @@ test.describe('Room Header Layout', () => {
     const heading = page.getByRole('heading', { level: 1 })
     await expect(heading).toHaveAttribute('title', UNBREAKABLE_ROOM_NAME)
 
-    const isTruncated = await heading.evaluate((el) => el.scrollWidth > el.clientWidth)
-    expect(isTruncated).toBe(true)
+    // line-clamp は横ではなく縦に切るので、scrollHeight で判定する
+    const isClamped = await heading.evaluate((el) => el.scrollHeight > el.clientHeight)
+    expect(isClamped).toBe(true)
 
     // ルームコードは招待に必要なので、省略されず読めること
     const code = page.url().split('/').pop()!
-    await expect(page.getByText(`Room: ${code}`)).toBeVisible()
+    const codeLine = page.getByText(`Room: ${code}`)
+    await expect(codeLine).toBeVisible()
+    const codeMetrics = await codeLine.evaluate((el) => ({
+      scrollWidth: el.scrollWidth,
+      clientWidth: el.clientWidth,
+    }))
+    expect(codeMetrics.clientWidth).toBeGreaterThanOrEqual(codeMetrics.scrollWidth)
+
+    await context.close()
+  })
+
+  // truncate（1行省略）だと、折り返せる日本語名まで狭い画面で大きく切られてしまう。
+  // 退避手段の title はタッチ端末でホバーできないため、唯一影響を受ける環境で
+  // 全文が読めなくなる。wrap-anywhere + line-clamp-2 でこれを避けている。
+  test('should keep an ordinary Japanese room name fully readable on a narrow viewport', async ({
+    browser,
+  }) => {
+    const context = await browser.newContext({ viewport: { width: 375, height: 800 } })
+    const page = await context.newPage()
+    await createRoom(page, 'リリース前バックログ見積もり会', 'Host')
+
+    const heading = page.getByRole('heading', { level: 1 })
+    await expect(heading).toBeVisible()
+
+    const metrics = await heading.evaluate((el) => ({
+      scrollWidth: el.scrollWidth,
+      clientWidth: el.clientWidth,
+      scrollHeight: el.scrollHeight,
+      clientHeight: el.clientHeight,
+    }))
+    expect(metrics.clientWidth).toBeGreaterThanOrEqual(metrics.scrollWidth)
+    expect(metrics.clientHeight).toBeGreaterThanOrEqual(metrics.scrollHeight)
+
+    const pageOverflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - window.innerWidth,
+    )
+    expect(pageOverflow).toBeLessThanOrEqual(0)
 
     await context.close()
   })
@@ -75,8 +112,11 @@ test.describe('Room Header Layout', () => {
     const metrics = await heading.evaluate((el) => ({
       scrollWidth: el.scrollWidth,
       clientWidth: el.clientWidth,
+      scrollHeight: el.scrollHeight,
+      clientHeight: el.clientHeight,
     }))
     expect(metrics.clientWidth).toBeGreaterThanOrEqual(metrics.scrollWidth)
+    expect(metrics.clientHeight).toBeGreaterThanOrEqual(metrics.scrollHeight)
 
     await context.close()
   })
