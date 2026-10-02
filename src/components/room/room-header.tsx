@@ -25,9 +25,7 @@ export function RoomHeader({ onToggleHistory }: RoomHeaderProps) {
   const [isPending, startTransition] = useTransition()
 
   const isRevealed = currentSession?.is_revealed ?? false
-  const currentParticipant = participants.find(
-    (p) => p.id === currentParticipantId,
-  )
+  const currentParticipant = participants.find((p) => p.id === currentParticipantId)
   const isFacilitator = currentParticipant?.is_facilitator ?? false
   const allowAllControl = useRoomStore((s) => s.allowAllControl)
 
@@ -51,25 +49,32 @@ export function RoomHeader({ onToggleHistory }: RoomHeaderProps) {
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-2">
-      <div className="flex items-center gap-4">
-        <div>
+      {/* min-w-0 がないと、折り返し機会の無い長いルーム名（上限100文字）で
+          この列がコンテンツ幅を主張し、ページ全体が横にあふれる。
+          参加者リスト（participant-list.tsx）と同じ原因。 */}
+      <div className="flex min-w-0 items-center gap-4">
+        <div className="min-w-0">
           {roomName ? (
             <>
-              <h1 className="text-2xl font-bold">{roomName}</h1>
+              <h1 className="truncate text-2xl font-bold" title={roomName}>
+                {roomName}
+              </h1>
               <p className="text-muted-foreground text-sm">Room: {roomCode}</p>
             </>
           ) : (
             <h1 className="text-2xl font-bold">Room: {roomCode}</h1>
           )}
           {currentSession?.topic && (
-            <p className="text-muted-foreground text-sm">
+            <p className="text-muted-foreground truncate text-sm" title={currentSession.topic}>
               {currentSession.topic}
             </p>
           )}
         </div>
         <CountdownTimer />
         {currentSession && !isRevealed && totalVoters > 0 && (
-          <span className="text-sm text-muted-foreground">
+          // shrink-0 と whitespace-nowrap が無いと、狭い画面で 1 文字ずつ
+          // 縦に折り返されて潰れる（min-w-0 により縮める余地ができたため）
+          <span className="text-muted-foreground shrink-0 text-sm whitespace-nowrap">
             {t('roomHeader.votingProgress', { voted: votedCount, total: totalVoters })}
           </span>
         )}
