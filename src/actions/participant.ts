@@ -2,7 +2,14 @@
 
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 
-export async function removeParticipant(participantId: string) {
+export type RemoveParticipantState = {
+  readonly error?: string
+  readonly success?: boolean
+}
+
+export async function removeParticipant(
+  participantId: string,
+): Promise<RemoveParticipantState> {
   if (!participantId) {
     return { error: 'errors.invalidInput' }
   }

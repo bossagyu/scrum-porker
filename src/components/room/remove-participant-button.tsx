@@ -25,17 +25,29 @@ export function RemoveParticipantButton({
 }: RemoveParticipantButtonProps) {
   const t = useTranslations()
   const [open, setOpen] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
+
+  const handleOpenChange = (newOpen: boolean) => {
+    if (newOpen) {
+      setError(null)
+    }
+    setOpen(newOpen)
+  }
 
   const handleConfirm = () => {
     startTransition(async () => {
-      await removeParticipant(participantId)
+      const result = await removeParticipant(participantId)
+      if (result.error) {
+        setError(result.error)
+        return
+      }
       setOpen(false)
     })
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button
           variant="ghost"
@@ -51,6 +63,11 @@ export function RemoveParticipantButton({
             {t('participant.removeConfirmTitle', { name: displayName })}
           </DialogTitle>
         </DialogHeader>
+        {error && (
+          <p className="text-sm text-destructive" role="alert">
+            {t(error)}
+          </p>
+        )}
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)} disabled={isPending}>
             {t('common.cancel')}
