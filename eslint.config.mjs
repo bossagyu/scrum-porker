@@ -3,6 +3,9 @@
 // 自己参照を含む）を JSON 化しようとして
 // "TypeError: Converting circular structure to JSON" で落ちる。
 import nextCoreWebVitals from 'eslint-config-next/core-web-vitals'
+// typescript 側は必須。core-web-vitals だけだと @typescript-eslint/* が 0 件で、
+// no-explicit-any / no-unused-vars / ban-ts-comment など 20 ルールが入らない
+// （core-web-vitals が内部に持つ next/typescript はパーサ設定のみ）。
 import nextTypescript from 'eslint-config-next/typescript'
 
 const eslintConfig = [
