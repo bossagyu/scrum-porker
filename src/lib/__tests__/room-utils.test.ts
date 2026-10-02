@@ -5,6 +5,7 @@ import {
   calculateAverage,
   calculateMedian,
   calculateMode,
+  isValidCustomCardValue,
   calculateDistribution,
 } from '../room-utils'
 
@@ -48,6 +49,9 @@ describe('isNumericCard', () => {
   })
 
   it('returns false for special cards', () => {
+    expect(isNumericCard('')).toBe(false)
+    expect(isNumericCard('  ')).toBe(false)
+    expect(isNumericCard('Infinity')).toBe(false)
     expect(isNumericCard('?')).toBe(false)
     expect(isNumericCard('∞')).toBe(false)
     expect(isNumericCard('☕')).toBe(false)
@@ -132,18 +136,34 @@ describe('calculateMode', () => {
     expect(calculateMode([])).toEqual([])
   })
 
-  it('includes special cards in mode calculation', () => {
-    expect(calculateMode(['?', '?', '5'])).toEqual(['?'])
+  it('excludes special cards from mode calculation', () => {
+    // 平均・中央値と揃える（CLAUDE.md: Special cards excluded from statistics）
+    expect(calculateMode(['?', '?', '5', '5', '8'])).toEqual(['5'])
   })
 
-  it('handles single vote', () => {
-    expect(calculateMode(['8'])).toEqual(['8'])
+  it('returns an empty array when only special cards were voted', () => {
+    expect(calculateMode(['?', '∞', '☕', '☕'])).toEqual([])
   })
 
-  it('returns all values when all have equal count', () => {
-    const result = calculateMode(['1', '3', '5'])
-    expect(result).toHaveLength(3)
-    expect(result).toContain('1')
+  it('keeps non-numeric card sets such as t-shirt sizes', () => {
+    // Tシャツは平均・中央値が null なので、最頻値が唯一の統計になる
+    expect(calculateMode(['M', 'M', 'L'])).toEqual(['M'])
+  })
+
+  it('returns an empty array for a single vote', () => {
+    // 1票では「最も多い」も何も無い
+    expect(calculateMode(['8'])).toEqual([])
+  })
+
+  it('returns an empty array when nothing is repeated', () => {
+    // 全員が1票ずつなら最頻値は意味を持たないので --- 表示にする
+    expect(calculateMode(['1', '3', '5'])).toEqual([])
+  })
+
+  it('still reports a meaningful tie', () => {
+    // 同数でも重複があれば山の位置として有用なので返す
+    const result = calculateMode(['3', '3', '5', '5'])
+    expect(result).toHaveLength(2)
     expect(result).toContain('3')
     expect(result).toContain('5')
   })
@@ -173,5 +193,31 @@ describe('calculateDistribution', () => {
     const result = calculateDistribution(['3', '3', '3'])
     expect(result.size).toBe(1)
     expect(result.get('3')).toBe(3)
+  })
+})
+
+describe('isValidCustomCardValue', () => {
+  it('accepts plain decimal values', () => {
+    expect(isValidCustomCardValue('0')).toBe(true)
+    expect(isValidCustomCardValue('5')).toBe(true)
+    expect(isValidCustomCardValue('0.5')).toBe(true)
+    expect(isValidCustomCardValue('13')).toBe(true)
+    expect(isValidCustomCardValue(' 8 ')).toBe(true)
+  })
+
+  it('rejects values that Number() would silently accept', () => {
+    // どれも !isNaN(Number(v)) を通ってしまうが、カード面の文字列と
+    // 計算に使う値が食い違う / 見積もりとして意味を成さない
+    expect(isValidCustomCardValue('Infinity')).toBe(false)
+    expect(isValidCustomCardValue('1e3')).toBe(false)
+    expect(isValidCustomCardValue('0x10')).toBe(false)
+    expect(isValidCustomCardValue('-3')).toBe(false)
+    expect(isValidCustomCardValue('')).toBe(false)
+    expect(isValidCustomCardValue('  ')).toBe(false)
+  })
+
+  it('rejects non-numeric values', () => {
+    expect(isValidCustomCardValue('M')).toBe(false)
+    expect(isValidCustomCardValue('5pt')).toBe(false)
   })
 })
