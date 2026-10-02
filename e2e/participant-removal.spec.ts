@@ -62,6 +62,53 @@ test.describe('Participant Removal', () => {
     await joinerContext.close()
   })
 
+  test('should auto-reveal immediately when removing the last outstanding voter (removal happens last)', async ({
+    browser,
+  }) => {
+    // Regression test for the actual motivation behind #24: votes can already
+    // be complete among the *remaining* voters before the removal happens.
+    // auto_reveal_if_complete is normally only triggered from submitVote, so
+    // if remove_participant doesn't also re-run it, the room gets stuck
+    // showing "2/2 voted" forever with nothing left to trigger a reveal.
+    const facilitatorContext = await browser.newContext()
+    const facilitatorPage = await facilitatorContext.newPage()
+    const code = await createRoom(
+      facilitatorPage,
+      'Auto Reveal On Removal',
+      'Facilitator',
+      { autoReveal: true },
+    )
+
+    const joiner1Context = await browser.newContext()
+    const joiner1Page = await joiner1Context.newPage()
+    await joinRoom(joiner1Page, code, 'Joiner1')
+
+    const joiner2Context = await browser.newContext()
+    const joiner2Page = await joiner2Context.newPage()
+    await joinRoom(joiner2Page, code, 'Joiner2')
+
+    await expect(facilitatorPage.getByText('Joiner1', { exact: true })).toBeVisible()
+    await expect(facilitatorPage.getByText('Joiner2', { exact: true })).toBeVisible()
+
+    // Facilitator and Joiner1 vote; Joiner2 never votes. With 3 active
+    // voters, this must NOT reveal yet.
+    await facilitatorPage.getByRole('button', { name: '5', exact: true }).click()
+    await joiner1Page.getByRole('button', { name: '8', exact: true }).click()
+    await facilitatorPage.waitForTimeout(4000)
+    await expect(facilitatorPage.getByText('投票結果')).not.toBeVisible()
+
+    // Removing the only remaining non-voter (last, after the votes) must
+    // trigger the reveal on its own, with no further voting action.
+    await removeParticipant(facilitatorPage, 'Joiner2')
+
+    await expect(facilitatorPage.getByText('投票結果')).toBeVisible({ timeout: 10_000 })
+    await expect(joiner1Page.getByText('投票結果')).toBeVisible({ timeout: 10_000 })
+
+    await facilitatorContext.close()
+    await joiner1Context.close()
+    await joiner2Context.close()
+  })
+
   test('should show a removed message on the removed participant screen', async ({
     browser,
   }) => {
