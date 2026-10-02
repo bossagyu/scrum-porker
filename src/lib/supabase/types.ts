@@ -159,6 +159,10 @@ export type Database = {
         Args: Record<string, never>
         Returns: string[]
       }
+      remove_participant: {
+        Args: { p_participant_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never

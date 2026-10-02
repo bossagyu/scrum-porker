@@ -13,8 +13,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 export function VoteSummary() {
   const t = useTranslations()
   const votes = useRoomStore((s) => s.votes)
+  const participants = useRoomStore((s) => s.participants)
 
-  const cardValues = votes.map((v) => v.card_value)
+  // Keep this in sync with VoteResult: only count votes from participants
+  // still in the room. A removed participant's vote can still exist in an
+  // already-revealed session (kept for history), but it must not skew the
+  // statistics shown alongside a result list that no longer displays them.
+  const activeParticipantIds = new Set(participants.map((p) => p.id))
+  const cardValues = votes
+    .filter((v) => activeParticipantIds.has(v.participant_id))
+    .map((v) => v.card_value)
   const average = calculateAverage(cardValues)
   const median = calculateMedian(cardValues)
   const mode = calculateMode(cardValues)

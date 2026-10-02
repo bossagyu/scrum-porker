@@ -169,6 +169,18 @@ export async function joinRoom(
     .single()
 
   if (existing) {
+    if (!existing.is_active) {
+      // Reactivate a previously-removed participant. Keep the existing
+      // display_name so we don't trip the UNIQUE(room_id, display_name)
+      // constraint with a newly-typed name.
+      const { error: reactivateError } = await supabase
+        .from('participants')
+        .update({ is_active: true })
+        .eq('id', existing.id)
+
+      if (reactivateError) return { error: 'errors.joinFailed' }
+    }
+
     return { redirectTo: `/room/${roomCode}` }
   }
 

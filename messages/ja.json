@@ -6,7 +6,8 @@
     "close": "閉じる",
     "save": "保存",
     "saving": "保存中...",
-    "settings": "設定"
+    "settings": "設定",
+    "cancel": "キャンセル"
   },
   "theme": {
     "light": "ライト",
@@ -47,7 +48,8 @@
     "selectCard": "カードを選択",
     "observerCannotVote": "オブザーバーは投票できません",
     "noSession": "投票セッションがまだ開始されていません",
-    "result": "投票結果"
+    "result": "投票結果",
+    "removedFromRoom": "このルームから削除されました"
   },
   "cardSets": {
     "fibonacci": "フィボナッチ数列",
@@ -69,7 +71,10 @@
     "facilitator": "ファシリテーター",
     "observer": "オブザーバー",
     "voted": "投票済み",
-    "notVoted": "未投票"
+    "notVoted": "未投票",
+    "removeAriaLabel": "{name}を削除",
+    "removeConfirmTitle": "{name} をルームから削除しますか？",
+    "removeConfirm": "削除"
   },
   "roomHeader": {
     "reveal": "結果を公開",
@@ -133,6 +138,9 @@
     "historyFetch": "履歴の取得に失敗しました",
     "invalidSession": "無効なセッションIDです",
     "invalidRoom": "無効なルームIDです",
+    "removeParticipant": "参加者の削除に失敗しました",
+    "removeParticipantFailed": "参加者を削除できませんでした",
+    "participantRemoved": "この参加者はルームから削除されています",
     "unknown": "不明"
   },
   "validation": {

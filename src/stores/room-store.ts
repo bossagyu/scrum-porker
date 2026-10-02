@@ -17,6 +17,9 @@ type RoomState = {
   readonly autoReveal: boolean
   readonly allowAllControl: boolean
   readonly customCards: string[] | null
+  // Invariant: only active (is_active = true) participants are kept here.
+  // Removed participants must never appear, both on initial load/poll and
+  // on realtime updates.
   readonly participants: readonly ParticipantRow[]
   readonly currentSession: VotingSessionRow | null
   readonly votes: readonly VoteRow[]
@@ -128,9 +131,20 @@ export const useRoomStore = create<RoomStore>((set, get) => ({
         }
       } else if (eventType === 'UPDATE' && newRecord) {
         const updated = newRecord as unknown as ParticipantRow
-        set({
-          participants: state.participants.map((p) => (p.id === updated.id ? updated : p)),
-        })
+        if (!updated.is_active) {
+          // participants only ever holds active rows; drop it immediately
+          // instead of waiting for the next poll to filter it out.
+          set({
+            participants: state.participants.filter((p) => p.id !== updated.id),
+          })
+        } else {
+          const exists = state.participants.some((p) => p.id === updated.id)
+          set({
+            participants: exists
+              ? state.participants.map((p) => (p.id === updated.id ? updated : p))
+              : [...state.participants, updated],
+          })
+        }
       } else if (eventType === 'DELETE' && oldRecord) {
         const deleted = oldRecord as unknown as { id: string }
         set({
@@ -274,6 +288,7 @@ export const useRoomStore = create<RoomStore>((set, get) => ({
         .from('participants')
         .select('*')
         .eq('room_id', roomId)
+        .eq('is_active', true)
 
       if (participants) {
         set({ participants })
