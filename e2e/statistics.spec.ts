@@ -45,6 +45,51 @@ test.describe('Statistics', () => {
     await joinerContext.close()
   })
 
+  // 最頻値はチームが採用する見積もり値なので、平均・中央値より目立つこと。
+  test('should render the mode more prominently than the other statistics', async ({ browser }) => {
+    const hostContext = await browser.newContext()
+    const hostPage = await hostContext.newPage()
+    const code = await createRoom(hostPage, 'Prominence Test', 'Host', {
+      autoReveal: false,
+    })
+
+    const joinerContext = await browser.newContext()
+    const joinerPage = await joinerContext.newPage()
+    await joinRoom(joinerPage, code, 'Joiner')
+
+    await hostPage.getByRole('button', { name: '5', exact: true }).click()
+    await joinerPage.getByRole('button', { name: '5', exact: true }).click()
+    await expect(hostPage.getByText('投票済み', { exact: true })).toHaveCount(2, {
+      timeout: 15_000,
+    })
+
+    await hostPage.getByRole('button', { name: '結果を公開' }).click()
+    await expect(hostPage.getByText('統計')).toBeVisible({ timeout: 15_000 })
+
+    const fontSizeOf = (label: string) =>
+      hostPage
+        .locator('div', { has: hostPage.getByText(label, { exact: true }) })
+        .last()
+        .locator('p')
+        .last()
+        .evaluate((el) => parseFloat(getComputedStyle(el).fontSize))
+
+    const modeSize = await fontSizeOf('最頻値')
+    const averageSize = await fontSizeOf('平均')
+    const medianSize = await fontSizeOf('中央値')
+
+    expect(modeSize).toBeGreaterThan(averageSize)
+    expect(modeSize).toBeGreaterThan(medianSize)
+
+    // 最頻値が平均・中央値より先に（上に）置かれていること
+    const modeBox = await hostPage.getByText('最頻値', { exact: true }).boundingBox()
+    const averageBox = await hostPage.getByText('平均', { exact: true }).boundingBox()
+    expect(modeBox!.y).toBeLessThan(averageBox!.y)
+
+    await hostContext.close()
+    await joinerContext.close()
+  })
+
   test('should exclude special cards from every statistic', async ({ browser }) => {
     const hostContext = await browser.newContext()
     const hostPage = await hostContext.newPage()

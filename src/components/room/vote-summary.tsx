@@ -37,24 +37,22 @@ export function VoteSummary() {
         <CardTitle>{t('statistics.title')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-3 gap-4 text-center">
+        {/* 最頻値はチームが見積もりとして採用する値なので、統計の中で最も目立たせる。
+            平均・中央値は参考値として下段に小さく置く。 */}
+        <div className="bg-muted/50 rounded-lg px-4 py-6 text-center">
+          <p className="text-muted-foreground text-sm">{t('statistics.mode')}</p>
+          <p className="wrap-anywhere mt-1 text-4xl font-bold tracking-tight sm:text-5xl">
+            {mode.length > 0 ? mode.join(', ') : '---'}
+          </p>
+        </div>
+        <div className="grid grid-cols-2 gap-4 text-center">
           <div>
             <p className="text-muted-foreground text-sm">{t('statistics.average')}</p>
-            <p className="text-2xl font-bold">
-              {average !== null ? average.toFixed(1) : '---'}
-            </p>
+            <p className="text-xl font-semibold">{average !== null ? average.toFixed(1) : '---'}</p>
           </div>
           <div>
             <p className="text-muted-foreground text-sm">{t('statistics.median')}</p>
-            <p className="text-2xl font-bold">
-              {median !== null ? median.toFixed(1) : '---'}
-            </p>
-          </div>
-          <div>
-            <p className="text-muted-foreground text-sm">{t('statistics.mode')}</p>
-            <p className="text-2xl font-bold">
-              {mode.length > 0 ? mode.join(', ') : '---'}
-            </p>
+            <p className="text-xl font-semibold">{median !== null ? median.toFixed(1) : '---'}</p>
           </div>
         </div>
 
@@ -65,23 +63,16 @@ export function VoteSummary() {
             </p>
             {[...distribution.entries()].map(([value, count]) => (
               <div key={value} className="flex items-center gap-2">
-                <span className="w-10 text-right text-sm font-medium">
-                  {value}
-                </span>
+                <span className="w-10 text-right text-sm font-medium">{value}</span>
                 <div className="flex-1">
                   <div
                     className="bg-primary h-6 rounded transition-all duration-700 ease-out"
                     style={{
-                      width:
-                        maxCount > 0
-                          ? `${(count / maxCount) * 100}%`
-                          : '0%',
+                      width: maxCount > 0 ? `${(count / maxCount) * 100}%` : '0%',
                     }}
                   />
                 </div>
-                <span className="text-muted-foreground w-8 text-sm">
-                  {count}
-                </span>
+                <span className="text-muted-foreground w-8 text-sm">{count}</span>
               </div>
             ))}
           </div>
