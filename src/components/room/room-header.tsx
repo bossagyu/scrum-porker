@@ -25,9 +25,7 @@ export function RoomHeader({ onToggleHistory }: RoomHeaderProps) {
   const [isPending, startTransition] = useTransition()
 
   const isRevealed = currentSession?.is_revealed ?? false
-  const currentParticipant = participants.find(
-    (p) => p.id === currentParticipantId,
-  )
+  const currentParticipant = participants.find((p) => p.id === currentParticipantId)
   const isFacilitator = currentParticipant?.is_facilitator ?? false
   const allowAllControl = useRoomStore((s) => s.allowAllControl)
 
@@ -51,25 +49,37 @@ export function RoomHeader({ onToggleHistory }: RoomHeaderProps) {
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-2">
-      <div className="flex items-center gap-4">
-        <div>
+      {/* min-w-0 がないと、折り返し機会の無い長いルーム名（上限100文字）で
+          この列がコンテンツ幅を主張し、ページ全体が横にあふれる。
+          参加者リスト（participant-list.tsx）と同じ原因。
+          h1 は truncate（1行省略）ではなく wrap-anywhere + line-clamp-2。
+          truncate だと折り返せる日本語名まで狭い画面で大きく切られ、
+          退避手段の title はタッチ端末でホバーできないため読めなくなる。
+          wrap-anywhere は ASCII 連続文字列にも分割位置を与えるので、
+          min-content が 1 文字分になりあふれが消える。 */}
+      <div className="flex min-w-0 items-center gap-4">
+        <div className="min-w-0">
           {roomName ? (
             <>
-              <h1 className="text-2xl font-bold">{roomName}</h1>
+              <h1 className="line-clamp-2 wrap-anywhere text-2xl font-bold" title={roomName}>
+                {roomName}
+              </h1>
               <p className="text-muted-foreground text-sm">Room: {roomCode}</p>
             </>
           ) : (
             <h1 className="text-2xl font-bold">Room: {roomCode}</h1>
           )}
           {currentSession?.topic && (
-            <p className="text-muted-foreground text-sm">
+            <p className="text-muted-foreground truncate text-sm" title={currentSession.topic}>
               {currentSession.topic}
             </p>
           )}
         </div>
         <CountdownTimer />
         {currentSession && !isRevealed && totalVoters > 0 && (
-          <span className="text-sm text-muted-foreground">
+          // whitespace-nowrap が無いと、狭い画面で 1 文字ずつ縦に折り返されて
+          // 潰れる（min-w-0 により縮める余地ができたため）
+          <span className="text-muted-foreground text-sm whitespace-nowrap">
             {t('roomHeader.votingProgress', { voted: votedCount, total: totalVoters })}
           </span>
         )}
