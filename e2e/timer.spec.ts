@@ -25,6 +25,10 @@ test.describe('Countdown Timer', () => {
     // 公開してしまい、タイマー満了ではなく投票完了で「投票結果」が出る。
     // それだと revealOnTimerExpiry が一度も呼ばれず、このテストは緑のまま
     // タイマー機能を一切検証しないことになる。
+    // タイマーの起点は voting_sessions.created_at（ルーム作成時）なので、
+    // 経過時間もルーム作成前から測る。投票完了時刻を起点にすると、
+    // セットアップに数秒かかっただけで閾値を割って flaky になる。
+    const startedAt = Date.now()
     const code = await createRoom(hostPage, 'Timer Expiry Test', 'Host', {
       timerDuration: 30,
       autoReveal: false,
@@ -48,15 +52,15 @@ test.describe('Countdown Timer', () => {
     await expect(hostPage.getByText('投票結果')).not.toBeVisible()
 
     // Wait for timer to expire and auto-reveal
-    const startedAt = Date.now()
     await expect(hostPage.getByText('投票結果')).toBeVisible({
       timeout: 40_000,
     })
     const waitedMs = Date.now() - startedAt
 
-    // 「投票完了による公開」で通ってしまう回帰を検出する。タイマー満了を
-    // 待っていれば、投票完了直後からでも 20 秒以上は経過しているはず。
-    expect(waitedMs).toBeGreaterThan(20_000)
+    // 公開は必ず session_created + 30s 以降なので、ルーム作成からの経過は
+    // 常に 30 秒を超える（遅いマシンでは増える方向にしか動かない）。
+    // 「投票完了による公開」なら 5〜9 秒で到達するため、ここで落ちる。
+    expect(waitedMs).toBeGreaterThan(25_000)
 
     // Statistics should be displayed
     await expect(hostPage.getByText('平均')).toBeVisible()
