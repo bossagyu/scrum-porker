@@ -23,6 +23,9 @@ export function CountdownTimer() {
 
   useEffect(() => {
     if (!timerDuration || !sessionCreatedAt || isRevealed) {
+      // 残り秒数はブラウザの時計（Date.now）からしか決まらず、SSR では計算できない。
+      // 描画中に求めるとハイドレーション不一致になるため effect で設定する。
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setRemainingSeconds(null)
       return
     }

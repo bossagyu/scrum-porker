@@ -27,6 +27,9 @@ export function JoinRoomForm({ defaultRoomCode, roomName }: JoinRoomFormProps) {
     try {
       const saved = localStorage.getItem(DISPLAY_NAME_STORAGE_KEY)
       if (saved) {
+        // localStorage はサーバーに存在しないので、マウント後に読むしかない。
+        // 描画中に読むとハイドレーション不一致になる。
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setSavedDisplayName(saved)
         displayNameRef.current = saved
       }

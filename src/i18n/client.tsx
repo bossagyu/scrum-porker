@@ -28,7 +28,11 @@ export function I18nProvider({ children }: { readonly children: ReactNode }) {
   }
 
   useEffect(() => {
+    // detectLocale は localStorage と navigator.language を読むため
+    // サーバーでは実行できない。既定の 'ja' で描画してからマウント後に
+    // 上書きする（描画中に行うとハイドレーション不一致になる）。
     const detected = detectLocale()
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLocaleState(detected)
   }, [])
 

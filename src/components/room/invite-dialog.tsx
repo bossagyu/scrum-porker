@@ -30,6 +30,9 @@ export function InviteDialog({ roomCode }: InviteDialogProps) {
       : ''
 
   useEffect(() => {
+    // navigator はサーバーに存在しない。Web Share API の有無はマウント後に
+    // 判定するしかなく、描画中に行うとハイドレーション不一致になる。
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSupportsShare(typeof navigator.share === 'function')
   }, [])
 
