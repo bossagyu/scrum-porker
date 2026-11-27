@@ -47,7 +47,7 @@
 
 ### 前提条件
 
-- Node.js 20+
+- Node.js 22+ (`@supabase/supabase-js` が `engines: node >=22` を宣言している)
 - [pnpm](https://pnpm.io/)
 - [Docker](https://www.docker.com/) (ローカル Supabase 用)
 
